@@ -4,38 +4,48 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Skill Ledger</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..500;1,6..72,400&family=Hanken+Grotesk:wght@400;600;700&family=DM+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Work+Sans:wght@400;500&family=LXGW+WenKai+TC&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   COBALT GRID — two-color trend-report editorial system
-   paper + cobalt ink only. No accent. No depth. Radius 0.
-   Deliberately single-theme: the identity IS cream + cobalt.
+   SOFT EDITORIAL — warm magazine spread
+   Cormorant Garamond for headlines, Work Sans for body.
+   Cream paper field with pastel card fills. Rounded everywhere.
    ============================================================ */
 :root {
-  /* Colors — the whole system */
-  --paper:      #F0EBDE;
-  --paper-2:    #E6E0CE;
-  --ink:        #1F2BE0;
-  --ink-soft:   #5560E5;
-  --grid:       rgba(31, 43, 224, 0.10);
-  --ink-faint:  rgba(31, 43, 224, 0.18);
+  /* Colors */
+  --paper:       #F2EEDF;
+  --paper-2:     #ECE6D2;
+  --ink:         #2A241B;
+  --ink-soft:    #5C5345;
+  --card-fill:   rgba(255, 255, 255, 0.55);
+  --pink:        #E1A4C2;
+  --lemon:       #D6DD63;
+  --blush:       #E8C9B6;
+  --sage:        #B7C7A8;
+  --lilac:       #C9BEDC;
+  --rule-soft:   rgba(42, 36, 27, 0.18);
+  --rule-medium: rgba(42, 36, 27, 0.35);
 
-  /* Faces */
-  --serif: 'Newsreader', 'Noto Serif SC', Georgia, serif;
-  --sans:  'Hanken Grotesk', 'Noto Serif SC', system-ui, sans-serif;
-  --mono:  'DM Mono', ui-monospace, 'Cascadia Mono', monospace;
+  /* Faces — CJK Strategy C: Latin stays in Cormorant / Work Sans,
+     CJK glyphs fall through to LXGW WenKai TC / Noto Serif SC */
+  --serif: 'Cormorant Garamond', 'LXGW WenKai TC', 'Noto Serif SC', Georgia, serif;
+  --sans:  'Work Sans', 'Noto Serif SC', system-ui, sans-serif;
 
-  /* Spacing */
-  --edge:       clamp(20px, 3.6vw, 80px);
-  --pad-top:    clamp(28px, 5vh, 60px);
-  --pad-bottom: clamp(36px, 6vh, 80px);
-  --gap-lg:     clamp(28px, 3vw, 56px);
+  /* Spacing (4/8-unit rhythm) */
+  --edge:       clamp(24px, 3.6vw, 80px);
+  --pad-top:    clamp(32px, 5vh, 64px);
+  --pad-bottom: clamp(40px, 6vh, 80px);
+  --gap-lg:     clamp(28px, 3vw, 48px);
   --gap-md:     clamp(20px, 2.2vh, 36px);
-  --gap-sm:     clamp(14px, 1.6vh, 24px);
-  --gap-xs:     clamp(10px, 1.2vh, 18px);
+  --gap-sm:     clamp(12px, 1.6vh, 20px);
+  --gap-xs:     clamp(8px,  1.2vh, 16px);
 
-  /* Grid cell */
-  --cell: clamp(28px, 2.2vw, 44px);
+  /* Radii — no square corners */
+  --radius-card: 24px;
+  --radius-sm:   12px;
+  --radius-pill: 999px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -46,153 +56,93 @@ body {
   color: var(--ink);
   font-family: var(--sans);
   font-weight: 400;
-  font-size: clamp(14px, 0.95vw, 15px);
-  line-height: 1.7;              /* CJK body rhythm */
+  font-size: clamp(14px, 0.95vw, 16px);
+  line-height: 1.75;   /* CJK body rhythm */
   -webkit-font-smoothing: antialiased;
 }
 
-/* Graph paper — permanent, behind everything, non-disableable */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, var(--grid) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
-  background-size: var(--cell) var(--cell);
-}
-
 .sheet {
-  position: relative;
-  z-index: 1;
   max-width: 1280px;
   margin: 0 auto;
   padding-inline: var(--edge);
   padding-block: var(--pad-top) var(--pad-bottom);
 }
 
-/* ---------- Chrome hairlines ---------- */
-.hairline-top,
-.hairline-bottom {
-  position: fixed;
-  left: var(--edge);
-  right: var(--edge);
-  height: 1.5px;
-  background: var(--ink);
-  z-index: 2;
-  pointer-events: none;
-}
-.hairline-top    { top: calc(2.6vh + env(safe-area-inset-top, 0px)); }
-.hairline-bottom { bottom: calc(2vh + env(safe-area-inset-bottom, 0px)); }
-@media (max-width: 860px) {
-  .hairline-top, .hairline-bottom { display: none; }
-}
-
-.nav-hint,
-.pagenum {
-  position: fixed;
-  bottom: calc(clamp(48px, 4.8vh, 76px) + env(safe-area-inset-bottom, 0px));
-  font-family: var(--mono);
-  font-size: clamp(11px, 0.82vw, 13px);
-  letter-spacing: 0.06em;
-  z-index: 2;
-  pointer-events: none;
-}
-.nav-hint { left: var(--edge); opacity: 0.4; }
-.pagenum { right: var(--edge); }
-@media (max-width: 860px) {
-  .nav-hint, .pagenum { display: none; }
-}
-
-/* ---------- Signature decoration: pixel-glitch column ---------- */
-/* Right-edge scanline column. Shown only from 1440px up, where the
-   centered sheet leaves a clear gutter — it must never sit under the
-   interactive ledger. z-index 0 keeps it below .sheet content. */
-.pixel-glitch {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: clamp(160px, 14vw, 240px);
-  opacity: 0.6;
-  z-index: 0;
-  pointer-events: none;
-  display: none;
-}
-.pixel-glitch svg { display: block; width: 100%; height: 100%; }
-@media (min-width: 1440px) { .pixel-glitch { display: block; } }
-
-/* ---------- Signature decoration: QR-block patch ---------- */
-/* Paper fill plus 1.5px paper outset — the system's only box-shadow,
-   used as an anti-shadow so the mosaic stays readable over the grid. */
-.qr-block {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: 1.5px;
-  width: 58px;
-  height: 58px;
-  flex-shrink: 0;
-  background: var(--paper);
-  padding: 4px;
-  box-shadow: 0 0 0 1.5px var(--paper);
-}
-.qr-block .px { background: var(--paper); }
-.qr-block .px.on { background: var(--ink); }
-
-/* ---------- topbar-rule ---------- */
+/* ---------- topbar ---------- */
 .topbar {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--gap-sm);
   flex-wrap: wrap;
-  border-bottom: 1.5px solid var(--ink);
-  padding-bottom: clamp(12px, 1.4vh, 22px);
   margin-bottom: var(--gap-md);
+  padding-bottom: clamp(16px, 1.8vh, 28px);
+  border-bottom: 1.5px solid var(--rule-medium);
 }
 .topbar h1 {
   font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(46px, min(4.8vw, 8.2vh), 92px);
-  line-height: 0.95;
-  letter-spacing: -0.005em;
+  font-weight: 500;
+  font-size: clamp(38px, 4vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.01em;
   margin: 0;
-  text-wrap: balance;
+  color: var(--ink);
+}
+/* italic subphrase inside title — weight-drop signal */
+.topbar h1 em {
+  font-style: italic;
+  font-weight: 400;
 }
 .topbar-right {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: clamp(12px, 1.2vw, 20px);
 }
 .lab-tag {
-  font-family: var(--mono);
-  font-size: clamp(11px, 0.82vw, 13px);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: clamp(12px, 0.82vw, 14px);
+  font-weight: 400;
+  color: var(--ink-soft);
   white-space: nowrap;
-  padding-bottom: 4px;
 }
 
+/* Soft Editorial signature: pastel swatch dots */
+.swatch-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.swatch-dot {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---------- lede ---------- */
 .lede {
   font-family: var(--sans);
-  font-size: clamp(15px, 1vw, 18px);
-  max-width: 62ch;
+  font-size: clamp(14px, 1vw, 17px);
+  color: var(--ink-soft);
+  max-width: 64ch;
   margin: 0 0 var(--gap-md);
+  line-height: 1.7;
 }
 .lede code {
-  font-family: var(--mono);
-  font-size: 0.92em;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--ink-faint);
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--blush);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  font-size: 0.93em;
 }
 
 /* ---------- Column frame ---------- */
 .frame {
   display: grid;
-  grid-template-columns: 1fr clamp(320px, 30vw, 420px);
+  grid-template-columns: 1fr clamp(300px, 30vw, 420px);
   gap: var(--gap-lg);
   align-items: start;
 }
@@ -202,46 +152,58 @@ body::before {
 }
 
 /* ---------- Section eyebrow ---------- */
-/* Hanzi label: Hanken 600, no uppercase, no tracking (CJK rules) */
 .eyebrow {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--gap-sm);
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(12px, 0.9vw, 14px);
+  font-weight: 400;
+  font-size: clamp(12px, 0.88vw, 14px);
+  color: var(--ink);
+  border-bottom: 1.5px solid var(--rule-medium);
+  padding-bottom: 8px;
+  margin-bottom: var(--gap-xs);
   letter-spacing: 0;
-  border-bottom: 1.5px solid var(--ink);
-  padding-bottom: 6px;
-  margin-bottom: 2px;
 }
 .eyebrow .count {
-  font-family: var(--mono);
+  font-family: var(--serif);
+  font-style: italic;
   font-weight: 400;
-  font-size: clamp(11px, 0.82vw, 13px);
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
+  font-size: clamp(12px, 0.88vw, 14px);
+  color: var(--ink-soft);
 }
 
-/* ---------- ledger-row: one skill ---------- */
+/* ---------- ledger-row: one skill (card-soft style) ---------- */
 .ledger-row {
   display: grid;
-  grid-template-columns: 52px 1fr auto;
-  gap: clamp(12px, 1.4vw, 28px);
+  grid-template-columns: 40px 1fr auto;
+  gap: clamp(12px, 1.4vw, 24px);
   align-items: start;
-  border-bottom: 1px solid var(--ink-faint);
-  padding-block: clamp(14px, 1.8vh, 24px);
-  transition: opacity 160ms;
+  background: var(--card-fill);
+  border-radius: var(--radius-card);
+  padding: clamp(16px, 1.8vh, 24px) clamp(16px, 1.6vw, 24px);
+  margin-bottom: var(--gap-xs);
+  transition: opacity 160ms, background 160ms;
 }
-.ledger-row.is-off { opacity: 0.42; }
+.ledger-row.is-off {
+  opacity: 0.48;
+  background: transparent;
+}
+
+/* Locked skills get a lemon card fill to make them stand out */
+.ledger-row.is-locked {
+  background: color-mix(in srgb, var(--lemon) 28%, var(--card-fill));
+}
 
 .num-tag {
-  font-family: var(--mono);
-  font-size: clamp(12px, 0.85vw, 14px);
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  padding-top: 5px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(13px, 0.9vw, 16px);
+  color: var(--ink-soft);
+  padding-top: 4px;
+  letter-spacing: 0;
 }
 
 .row-main { min-width: 0; }
@@ -255,123 +217,153 @@ body::before {
 }
 .skill-name {
   font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(26px, 2vw, 40px);
+  font-weight: 500;
+  font-size: clamp(22px, 1.8vw, 34px);
   line-height: 1.05;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 .state-tag {
-  font-family: var(--mono);
-  font-size: clamp(11px, 0.78vw, 12px);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: inline-block;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(10px, 0.72vw, 12px);
+  letter-spacing: 0;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
   white-space: nowrap;
 }
-.state-tag.locked { font-weight: 500; }
-.state-tag.off { opacity: 0.55; }
+/* LOCKED → lemon pill */
+.state-tag.locked {
+  background: var(--lemon);
+  color: var(--ink);
+}
+/* Enabled → blush pill */
+.state-tag.enabled-tag {
+  background: var(--blush);
+  color: var(--ink);
+}
+/* Disabled → subtle */
+.state-tag.off {
+  background: var(--rule-soft);
+  color: var(--ink-soft);
+}
 
-.row-desc { margin: 0 0 var(--gap-xs); max-width: 58ch; }
+.row-desc {
+  margin: 0 0 var(--gap-xs);
+  max-width: 56ch;
+  font-size: clamp(13px, 0.9vw, 15px);
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
 
 .chip-line {
   display: flex;
   flex-wrap: wrap;
   gap: 0;
-  font-family: var(--mono);
-  font-size: clamp(11px, 0.8vw, 12.5px);
-  letter-spacing: 0.04em;
+  font-family: var(--sans);
+  font-size: clamp(11px, 0.78vw, 13px);
+  color: var(--ink-soft);
 }
 .chip-line .k {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.96em;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  opacity: 0.55;
-  margin-right: 8px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-right: 6px;
+  letter-spacing: 0;
 }
 .chip-line .v + .v::before {
   content: ' · ';
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
-/* ---------- Toggle: cobalt fill on, grid cell off. Square. ---------- */
+/* ---------- Toggle: pill switch, ink fill on ---------- */
 .switch {
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
   width: 44px;
-  height: 22px;
-  border: 1.5px solid var(--ink);
-  border-radius: 0;
-  background: var(--grid);
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--rule-soft);
+  border: 1.5px solid var(--rule-medium);
   position: relative;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 160ms;
+  transition: background 160ms, border-color 160ms;
 }
 .switch::after {
   content: '';
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 15px;
-  height: 15px;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
   background: var(--paper);
-  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(42,36,27,0.25);
   transition: transform 160ms;
 }
-.switch:checked { background: var(--ink); }
-.switch:checked::after { transform: translateX(21px); }
-.switch:disabled { cursor: not-allowed; opacity: 0.45; }
-.switch:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 3px; }
+.switch:checked {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.switch:checked::after { transform: translateX(20px); }
+.switch:disabled { cursor: not-allowed; opacity: 0.4; }
+.switch:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
-.switch-cell { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-top: 3px; }
+.switch-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding-top: 4px;
+}
 .switch-label {
-  font-family: var(--mono);
-  font-size: clamp(10px, 0.72vw, 11.5px);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.6;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(10px, 0.7vw, 12px);
+  color: var(--ink-soft);
 }
 
 /* ---------- Role override block ---------- */
 .roles {
   margin-top: var(--gap-xs);
-  border-top: 1px solid var(--ink-faint);
+  border-top: 1px dashed var(--rule-soft);
   padding-top: var(--gap-xs);
 }
 .roles-title {
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(11px, 0.8vw, 12.5px);
-  letter-spacing: 0;
-  opacity: 0.55;
+  font-weight: 400;
+  font-size: clamp(11px, 0.78vw, 13px);
+  color: var(--ink-soft);
   margin-bottom: 8px;
+  letter-spacing: 0;
 }
 .role-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
-  gap: 6px clamp(14px, 1.6vw, 28px);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px clamp(12px, 1.4vw, 24px);
 }
 .role-line {
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-family: var(--mono);
-  font-size: clamp(11px, 0.8vw, 12.5px);
-  letter-spacing: 0.03em;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: clamp(11px, 0.78vw, 13px);
+  color: var(--ink-soft);
 }
 .role-line.na { opacity: 0.35; }
-.role-name { min-width: 62px; }
+.role-name { min-width: 60px; }
 .mini-switch {
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
-  width: 26px;
-  height: 13px;
-  border: 1px solid var(--ink);
-  border-radius: 0;
-  background: var(--grid);
+  width: 28px;
+  height: 14px;
+  border-radius: var(--radius-pill);
+  background: var(--rule-soft);
+  border: 1px solid var(--rule-medium);
   position: relative;
   cursor: pointer;
   flex-shrink: 0;
@@ -381,135 +373,154 @@ body::before {
   position: absolute;
   top: 1px;
   left: 1px;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   background: var(--paper);
-  border: 1px solid var(--ink);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(42,36,27,0.2);
   transition: transform 140ms;
 }
-.mini-switch:checked { background: var(--ink); }
-.mini-switch:checked::after { transform: translateX(13px); }
+.mini-switch:checked { background: var(--ink); border-color: var(--ink); }
+.mini-switch:checked::after { transform: translateX(14px); }
 .mini-switch:disabled { cursor: not-allowed; opacity: 0.4; }
 .mini-switch:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 2px; }
-/* Hanzi run: no italic (NSC has no italic axis) — dim to ink-faint instead */
 .inherit {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.94em;
-  letter-spacing: 0;
-  opacity: 0.45;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.93em;
+  color: var(--ink-soft);
+  opacity: 0.6;
 }
 
-/* ---------- Output panel ---------- */
+/* ---------- Output panel (card-soft) ---------- */
 .col-output { position: sticky; top: var(--gap-md); }
 
 .panel {
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
+  background: var(--card-fill);
+  border-radius: var(--radius-card);
+  border: 1px dashed var(--rule-soft);
+  overflow: hidden;
 }
 .panel-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1.5px solid var(--ink);
-  padding: 10px clamp(12px, 1.2vw, 18px);
+  border-bottom: 1px dashed var(--rule-soft);
+  padding: 12px clamp(14px, 1.4vw, 20px);
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(12px, 0.9vw, 14px);
-  letter-spacing: 0;
+  font-weight: 500;
+  font-size: clamp(12px, 0.88vw, 14px);
+  color: var(--ink);
 }
-.tally { display: flex; gap: 14px; font-variant-numeric: tabular-nums; }
-.tally .off { opacity: 0.5; }
+.tally {
+  display: flex;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+}
+.tally .off { color: var(--ink-soft); }
 
 .yaml {
   margin: 0;
   padding: clamp(12px, 1.2vw, 18px);
-  font-family: var(--mono);
-  font-size: clamp(11.5px, 0.85vw, 13px);
+  font-family: 'ui-monospace', 'Cascadia Mono', monospace;
+  font-size: clamp(11.5px, 0.82vw, 13px);
   line-height: 1.75;
   white-space: pre;
   overflow-x: auto;
   max-height: 48vh;
   overflow-y: auto;
   tab-size: 2;
+  color: var(--ink);
 }
-.yaml .c { opacity: 0.5; }
+.yaml .c { color: var(--ink-soft); }
 .yaml .k { font-weight: 500; }
 
 .panel-foot {
-  border-top: 1px solid var(--ink-faint);
-  padding: 10px clamp(12px, 1.2vw, 18px);
+  border-top: 1px dashed var(--rule-soft);
+  padding: 12px clamp(14px, 1.4vw, 20px);
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-/* Hanzi control labels: Hanken 600, no uppercase, no tracking (CJK rules) */
+/* ---------- Buttons: pill style ---------- */
 .btn {
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(12px, 0.9vw, 14px);
+  font-weight: 500;
+  font-size: clamp(12px, 0.88vw, 14px);
   letter-spacing: 0;
   color: var(--ink);
-  background: var(--paper);
-  border: 1.5px solid var(--ink);
-  border-radius: 0;
-  padding: 6px 14px;
+  background: var(--card-fill);
+  border: 1.5px solid var(--rule-medium);
+  border-radius: var(--radius-pill);
+  padding: 6px 18px;
   cursor: pointer;
-  transition: background 140ms, color 140ms;
+  transition: background 140ms, color 140ms, border-color 140ms;
 }
-.btn:hover { background: var(--ink); color: var(--paper); }
-.btn:active { background: var(--ink-soft); color: var(--paper); }
-.btn:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 3px; }
-.btn.solid { background: var(--ink); color: var(--paper); }
-.btn.solid:hover { background: var(--paper); color: var(--ink); }
+.btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.btn:active { background: var(--ink-soft); color: var(--paper); border-color: var(--ink-soft); }
+.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.btn.solid {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.btn.solid:hover { background: var(--ink-soft); border-color: var(--ink-soft); }
 
 .bar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .next-step {
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(11px, 0.8vw, 12.5px);
-  letter-spacing: 0;
-  opacity: 0.62;
+  font-weight: 400;
+  font-size: clamp(11px, 0.78vw, 13px);
+  color: var(--ink-soft);
   flex: 1 1 180px;
   min-width: 0;
   line-height: 1.55;
 }
 .next-step code {
-  font-family: var(--mono);
-  font-weight: 400;
-  font-size: 0.94em;
-  letter-spacing: 0.04em;
+  font-family: 'ui-monospace', 'Cascadia Mono', monospace;
+  font-size: 0.92em;
+  color: var(--ink);
+  background: var(--blush);
+  padding: 1px 4px;
+  border-radius: 4px;
 }
-/* Latin-only chrome stays mono */
 .copied {
-  font-family: var(--mono);
+  font-family: var(--serif);
+  font-style: italic;
   font-weight: 400;
-  font-size: clamp(11px, 0.82vw, 13px);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: clamp(11px, 0.78vw, 13px);
+  color: var(--ink-soft);
   opacity: 0;
   transition: opacity 180ms;
 }
 .copied.show { opacity: 1; }
 
-/* attribution-rule */
+/* ---------- Colophon ---------- */
 .colophon {
   margin-top: var(--gap-lg);
-  border-top: 1px solid var(--ink);
-  padding-top: clamp(10px, 1.2vh, 18px);
+  border-top: 1px dashed var(--rule-soft);
+  padding-top: clamp(12px, 1.4vh, 20px);
   display: flex;
   justify-content: space-between;
   gap: var(--gap-sm);
   flex-wrap: wrap;
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: clamp(11px, 0.8vw, 12.5px);
-  letter-spacing: 0;
-  opacity: 0.62;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(12px, 0.82vw, 14px);
+  color: var(--ink-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -519,43 +530,15 @@ body::before {
 </head>
 <body>
 
-<div class="hairline-top"></div>
-<div class="hairline-bottom"></div>
-<div class="nav-hint">TOGGLE → COPY → AI-SYNC</div>
-<div class="pagenum">01</div>
-
-<div class="pixel-glitch" aria-hidden="true">
-  <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-    <defs>
-      <pattern id="vsc" width="2.4" height="100" patternUnits="userSpaceOnUse">
-        <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
-      </pattern>
-    </defs>
-    <rect x="0"  y="0"  width="52" height="11" fill="url(#vsc)"/>
-    <rect x="18" y="11" width="48" height="12" fill="url(#vsc)"/>
-    <rect x="4"  y="23" width="56" height="13" fill="url(#vsc)"/>
-    <rect x="22" y="36" width="44" height="11" fill="url(#vsc)"/>
-    <rect x="8"  y="47" width="54" height="12" fill="url(#vsc)"/>
-    <rect x="16" y="59" width="50" height="13" fill="url(#vsc)"/>
-    <rect x="0"  y="72" width="58" height="12" fill="url(#vsc)"/>
-    <rect x="20" y="84" width="46" height="16" fill="url(#vsc)"/>
-  </svg>
-</div>
-
 <div class="sheet">
   <div class="topbar">
     <h1>Skill Ledger</h1>
     <div class="topbar-right">
       <div class="lab-tag">.ai / config.yaml — skills</div>
-      <div class="qr-block" aria-hidden="true">
-        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
-        <span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
-        <span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span>
-        <span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
-        <span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
-        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
-        <span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span>
-        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span>
+      <div class="swatch-row" aria-hidden="true">
+        <span class="swatch-dot" style="background:#E1A4C2"></span>
+        <span class="swatch-dot" style="background:#D6DD63"></span>
+        <span class="swatch-dot" style="background:#B7C7A8"></span>
       </div>
     </div>
   </div>
@@ -599,12 +582,21 @@ body::before {
 
   <div class="colophon">
     <span>AI-PROJECT-TEMPLATE — SKILL SWITCHBOARD</span>
-    <span>COBALT GRID / TWO-COLOR EDITORIAL</span>
+    <span>SOFT EDITORIAL / WARM MAGAZINE SPREAD</span>
   </div>
 </div>
 
 <script>
+// LOCKED skills first, then optional skills
 const SKILLS = [
+  { name: "check-security",
+    desc: "对 diff 做限定范围的安全检查:认证、授权、输入解析、路径处理、密钥、依赖、网络暴露面。",
+    agents: ["reviewer", "backend"],
+    scope: ["**/*"] },
+  { name: "verify-before-complete",
+    desc: "声称完成前执行验证门禁:ai-sync --check、ai-check、lint、变更路径测试、项目构建。",
+    agents: ["architect", "backend", "frontend", "reviewer"],
+    scope: ["**/*"] },
   { name: "project-bootstrap",
     desc: "在仓库里落地 .ai 配置体系:填写项目身份、用真实领域规则替换示例、生成各模型入口。接入新项目时执行一次。",
     agents: ["architect"],
@@ -625,14 +617,6 @@ const SKILLS = [
     desc: "判定 API 或契约变更是兼容还是破坏性;破坏性变更必须先有两阶段迁移方案才能落地。",
     agents: ["architect", "backend", "reviewer"],
     scope: ["services/**/api/**", "**/*.proto", "docs/apis/**"] },
-  { name: "check-security",
-    desc: "对 diff 做限定范围的安全检查:认证、授权、输入解析、路径处理、密钥、依赖、网络暴露面。",
-    agents: ["reviewer", "backend"],
-    scope: ["**/*"] },
-  { name: "verify-before-complete",
-    desc: "声称完成前执行验证门禁:ai-sync --check、ai-check、lint、变更路径测试、项目构建。",
-    agents: ["architect", "backend", "frontend", "reviewer"],
-    scope: ["**/*"] }
 ];
 
 const AGENTS = ["architect", "backend", "frontend", "reviewer"];
@@ -663,17 +647,24 @@ function renderLedger() {
     const on = isOn(skill.name);
     const locked = isLocked(skill.name);
 
-    const row = el('div', 'ledger-row' + (on ? '' : ' is-off'));
+    let rowCls = 'ledger-row';
+    if (!on) rowCls += ' is-off';
+    if (locked) rowCls += ' is-locked';
+    const row = el('div', rowCls);
 
+    // italic Roman numeral style for the index
     row.appendChild(el('div', 'num-tag', String(i + 1).padStart(2, '0')));
 
     const main = el('div', 'row-main');
 
     const head = el('div', 'row-head');
     head.appendChild(el('div', 'skill-name', skill.name));
-    head.appendChild(el('div',
-      'state-tag ' + (locked ? 'locked' : (on ? '' : 'off')),
-      locked ? 'Locked' : (on ? 'Enabled' : 'Disabled')));
+
+    let tagCls, tagText;
+    if (locked)     { tagCls = 'state-tag locked';      tagText = 'Locked'; }
+    else if (on)    { tagCls = 'state-tag enabled-tag'; tagText = 'Enabled'; }
+    else            { tagCls = 'state-tag off';          tagText = 'Disabled'; }
+    head.appendChild(el('div', tagCls, tagText));
     main.appendChild(head);
 
     main.appendChild(el('p', 'row-desc', skill.desc));
@@ -683,7 +674,8 @@ function renderLedger() {
     skill.scope.forEach(s => chips.appendChild(el('span', 'v', s)));
     main.appendChild(chips);
 
-    if (on) {
+    // Role overrides: only for non-locked, enabled skills
+    if (on && !locked) {
       const roles = el('div', 'roles');
       roles.appendChild(el('div', 'roles-title', '角色覆盖'));
       const grid = el('div', 'role-grid');
@@ -697,9 +689,9 @@ function renderLedger() {
         mini.type = 'checkbox';
         mini.id = `r-${skill.name}-${role}`;
         mini.checked = roleOn(role, skill.name);
-        mini.disabled = locked || !relevant;
+        mini.disabled = !relevant;
         mini.setAttribute('aria-label', `${role}: ${skill.name}`);
-        if (!locked && relevant) {
+        if (relevant) {
           mini.addEventListener('change', () => {
             if (state.roles[role] === null) {
               state.roles[role] = new Set(SKILLS.filter(s => isOn(s.name)).map(s => s.name));
