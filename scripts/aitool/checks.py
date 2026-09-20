@@ -11,6 +11,9 @@ SCHEMA_VERSION = 1
 ADR_NAME = re.compile(r"^\d{4}-[a-z0-9]+(-[a-z0-9]+)*\.md$")
 ADR_STATUS = re.compile(r"^-\s*Status:\s*(\S+)", re.MULTILINE)
 MD_LINK = re.compile(r"\[[^\]]*\]\(([^)#\s]+)(?:#[^)]*)?\)")
+# Autolinks: <https://...> and <path/to/file.md>. Bounded so an HTML tag like <br>
+# is not mistaken for one.
+MD_AUTOLINK = re.compile(r"<([A-Za-z0-9_./-]+\.[A-Za-z0-9_./-]*[A-Za-z0-9_/])>")
 VALID_STATUS = {"proposed", "accepted", "superseded", "rejected"}
 
 
@@ -213,7 +216,7 @@ def check_links(ws, report):
             except ConfigError as exc:
                 report.error(rel, str(exc))
                 continue
-            for target in MD_LINK.findall(text):
+            for target in MD_LINK.findall(text) + MD_AUTOLINK.findall(text):
                 if target.startswith(("http://", "https://", "mailto:")):
                     continue
                 if not (path.parent / target).resolve().exists():

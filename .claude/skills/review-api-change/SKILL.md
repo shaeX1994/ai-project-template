@@ -1,6 +1,6 @@
 ---
 name: review-api-change
-description: 判定 API 或契约变更是兼容还是破坏性,破坏性变更必须先有迁移方案才能落地。当 schema、proto、OpenAPI 文档、handler 签名、响应结构或枚举发生变化时使用。Use when a contract changes.
+description: "判定 API 或契约变更是兼容还是破坏性,破坏性变更必须先有迁移方案才能落地。当 schema、proto、OpenAPI 文档、handler 签名、响应结构或枚举发生变化时使用。Use when a contract changes."
 metadata:
   x-template-version: "1"
 ---

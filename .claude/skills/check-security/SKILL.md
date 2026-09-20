@@ -1,6 +1,6 @@
 ---
 name: check-security
-description: 对 diff 做限定范围的安全检查。当变更涉及认证、授权、输入解析、路径或文件处理、子进程调用、反序列化、密钥、依赖,或任何开放网络监听的地方时使用。Use when a change touches auth, input parsing, secrets, or network surface.
+description: "对 diff 做限定范围的安全检查。当变更涉及认证、授权、输入解析、路径或文件处理、子进程调用、反序列化、密钥、依赖,或任何开放网络监听的地方时使用。Use when a change touches auth, input parsing, secrets, or network surface."
 metadata:
   x-template-version: "1"
 ---

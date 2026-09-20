@@ -1,6 +1,6 @@
 ---
 name: verify-before-complete
-description: 在声称任务完成之前执行项目验证门禁:构建、测试、lint、ai-check 和配置漂移检测。每次变更结束时、以及在声称任何东西能工作之前使用。Use at the end of every change before claiming it works.
+description: "在声称任务完成之前执行项目验证门禁:构建、测试、lint、ai-check 和配置漂移检测。每次变更结束时、以及在声称任何东西能工作之前使用。Use at the end of every change before claiming it works."
 metadata:
   x-template-version: "1"
 ---

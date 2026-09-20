@@ -1,6 +1,6 @@
 ---
 name: update-project-doc
-description: 只更新本次变更真正影响到的模块文档和架构文档,决策发生变化时新建 ADR。在功能、API、模块边界、配置或工作流发生变更后使用。绝不整体重写全局设计文档。Use after a feature, API, module boundary, or workflow change.
+description: "只更新本次变更真正影响到的模块文档和架构文档,决策发生变化时新建 ADR。在功能、API、模块边界、配置或工作流发生变更后使用。绝不整体重写全局设计文档。Use after a feature, API, module boundary, or workflow change."
 metadata:
   x-template-version: "1"
 ---

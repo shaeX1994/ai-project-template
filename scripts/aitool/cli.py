@@ -10,8 +10,8 @@ from pathlib import Path
 from .checks import ALL_CHECKS, Report
 from .model import BANNER, Workspace
 from .render import plan
-from .yamlmini import (ConfigError, digest, normalize, parse_yaml, read_text,
-                       write_text)
+from .yamlmini import (ConfigError, digest, normalize, parse_yaml, quote_scalar,
+                       read_text, write_text)
 
 COPY_TREES = (".ai", "docs", "scripts")
 SKIP_NAMES = {"__pycache__", ".git", ".pytest_cache"}
@@ -198,26 +198,37 @@ def set_project_fields(config, name, description, repo_url):
                 break
             key = line.strip().split(":", 1)[0]
             if key in fields and fields[key]:
-                value = str(fields[key]).replace('"', "'")
-                lines[index] = f'  {key}: "{value}"'
+                lines[index] = f"  {key}: {quote_scalar(fields[key])}"
     write_text(config, "\n".join(lines) + "\n")
 
 
 def set_adapters(config, adapters):
+    """Replace the adapters list, keeping any inline comment on the 'adapters:' line.
+
+    Any other key at the same indent ends the block. Content that is neither a list
+    item nor a comment is a structure this function cannot rewrite safely, so it fails
+    loudly rather than dropping lines.
+    """
     lines = read_text(config).splitlines()
     out, inside, done = [], False, False
     for line in lines:
-        if line.startswith("adapters:"):
+        if not inside and line.startswith("adapters:"):
             inside, done = True, True
-            out.append("adapters:")
+            head, sep, comment = line.partition("#")
+            out.append(f"adapters: #{comment}" if sep else "adapters:")
             out.extend(f"  - {a}" for a in adapters)
             continue
         if inside:
-            if line.startswith("  - ") or not line.strip():
-                if not line.strip():
-                    inside = False
-                    out.append(line)
+            if line.startswith("  - "):
                 continue
+            if not line.strip() or line.lstrip().startswith("#"):
+                inside = False
+                out.append(line)
+                continue
+            if line.startswith(("  ", "\t")):
+                raise ConfigError(
+                    f"{config}: 'adapters:' contains a nested block this tool cannot "
+                    f"rewrite: {line.strip()!r}. Edit the list by hand.")
             inside = False
         out.append(line)
     if not done:

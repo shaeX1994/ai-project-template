@@ -1,6 +1,6 @@
 ---
 name: project-bootstrap
-description: 在一个仓库里落地 .ai 配置体系:填写项目身份、用真实领域规则替换示例规则、生成各模型入口文件。接入新项目或新增服务时执行一次。Use once when onboarding a project or adding a new service.
+description: "在一个仓库里落地 .ai 配置体系:填写项目身份、用真实领域规则替换示例规则、生成各模型入口文件。接入新项目或新增服务时执行一次。Use once when onboarding a project or adding a new service."
 metadata:
   x-template-version: "1"
 ---

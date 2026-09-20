@@ -11,7 +11,7 @@ import fnmatch
 
 from .model import BANNER, may_embed, shift_headings
 from .sections import SECTIONS
-from .yamlmini import ConfigError
+from .yamlmini import ConfigError, quote_scalar
 
 
 def _header(ws, title):
@@ -69,14 +69,15 @@ def skill_dir(ws, adapter, spec):
             continue
         if not may_embed(doc, adapter):
             continue
-        meta = [f"name: {doc.name}", f"description: {doc.description}"]
+        meta = [f"name: {doc.name}",
+                f"description: {quote_scalar(doc.description)}"]
         for key in ("license", "compatibility", "allowed-tools"):
             if doc.meta.get(key):
-                meta.append(f"{key}: {doc.meta[key]}")
+                meta.append(f"{key}: {quote_scalar(doc.meta[key])}")
         extra = doc.meta.get("metadata") or {}
         if extra:
             meta.append("metadata:")
-            meta.extend(f"  {k}: \"{v}\"" for k, v in extra.items())
+            meta.extend(f"  {k}: {quote_scalar(v)}" for k, v in extra.items())
         front = "---\n" + "\n".join(meta) + "\n---\n"
         body = f"\n<!-- {BANNER} -->\n\n{doc.body.rstrip()}\n"
         path = f"{base}/{doc.name}/SKILL.md"

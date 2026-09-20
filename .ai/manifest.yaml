@@ -26,37 +26,37 @@ outputs:
       - .ai/policies/release.md
   - path: .claude/skills/check-security/SKILL.md
     adapter: claude
-    hash: 73e568f402874f20
+    hash: 0e96c8fc1c9d370f
     embeds:
       - .ai/skills/check-security/SKILL.md
   - path: .claude/skills/create-plan/SKILL.md
     adapter: claude
-    hash: 6b802a2caa21301a
+    hash: 4f4099e65ca30454
     embeds:
       - .ai/skills/create-plan/SKILL.md
   - path: .claude/skills/manage-todo/SKILL.md
     adapter: claude
-    hash: 375be28d9d0bb33b
+    hash: 9ebcd1e378275bd0
     embeds:
       - .ai/skills/manage-todo/SKILL.md
   - path: .claude/skills/project-bootstrap/SKILL.md
     adapter: claude
-    hash: 44dcde897e0fd68f
+    hash: 38b0dedf1df0b9e9
     embeds:
       - .ai/skills/project-bootstrap/SKILL.md
   - path: .claude/skills/review-api-change/SKILL.md
     adapter: claude
-    hash: 61f1af06820845c1
+    hash: e12b9c18f739bde4
     embeds:
       - .ai/skills/review-api-change/SKILL.md
   - path: .claude/skills/update-project-doc/SKILL.md
     adapter: claude
-    hash: c2d5f2b6f9694f2e
+    hash: 367e72a4adb07ec1
     embeds:
       - .ai/skills/update-project-doc/SKILL.md
   - path: .claude/skills/verify-before-complete/SKILL.md
     adapter: claude
-    hash: d0b05b2c644a407d
+    hash: 8d27e30b629d5f2e
     embeds:
       - .ai/skills/verify-before-complete/SKILL.md
   - path: .cursor/rules/core-architecture.mdc

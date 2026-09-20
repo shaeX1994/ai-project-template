@@ -19,7 +19,16 @@ class ConfigError(Exception):
     """Raised for a malformed or inconsistent configuration."""
 
 
-_TRAILING_COMMENT = re.compile(r"\s+#")
+def quote_scalar(value):
+    """Render a value as a double-quoted YAML scalar, escaping what would break it.
+
+    Inverse of the quoted-string branch of _parse_scalar, so a value written by this
+    function reads back unchanged.
+    """
+    text = str(value).replace("\\", "\\\\").replace('"', '\\"')
+    for broken, replacement in (("\r\n", " "), ("\n", " "), ("\r", " ")):
+        text = text.replace(broken, replacement)
+    return f'"{text}"'
 
 
 def parse_yaml(text, origin="<yaml>"):
@@ -105,22 +114,48 @@ def _parse_list(lines, index, indent, origin):
     return result, index
 
 
+def _split_comment(raw):
+    """Strip a trailing ' #...' comment, ignoring any # that sits inside quotes.
+
+    A blind '\\s+#' search truncates values like "path to #1 rule" at the hash. Walking
+    the string keeps quoted runs intact so only a genuine trailing comment is removed.
+    """
+    quote = None
+    for index, char in enumerate(raw):
+        if quote:
+            if char == quote:
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif char == "#" and index and raw[index - 1] in " \t":
+            return raw[:index].rstrip()
+    return raw.rstrip()
+
+
 def _parse_scalar(raw, origin="<yaml>", number=0):
     if raw.startswith(('"', "'")):
         quote = raw[0]
-        end = raw.find(quote, 1)
-        if end == -1:
+        out, index = [], 1
+        while index < len(raw):
+            char = raw[index]
+            if quote == '"' and char == "\\" and index + 1 < len(raw):
+                out.append(raw[index + 1])
+                index += 2
+                continue
+            if char == quote:
+                break
+            out.append(char)
+            index += 1
+        else:
             raise ConfigError(f"{origin}:{number}: unterminated string")
-        return raw[1:end]
+        return "".join(out)
     if raw.startswith("["):
         if "]" not in raw:
             raise ConfigError(f"{origin}:{number}: unterminated inline list")
         inner = raw[1:raw.rindex("]")]
         return [_parse_scalar(part.strip(), origin, number)
                 for part in inner.split(",") if part.strip()]
-    match = _TRAILING_COMMENT.search(raw)
-    if match:
-        raw = raw[:match.start()].strip()
+    raw = _split_comment(raw)
     lowered = raw.lower()
     if lowered in ("true", "yes"):
         return True

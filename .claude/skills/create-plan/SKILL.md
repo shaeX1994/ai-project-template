@@ -1,6 +1,6 @@
 ---
 name: create-plan
-description: 把任务转成可执行计划,包含范围、步骤、每步的验证命令和文档影响。当变更涉及多个文件、改动契约、或存在多种合理实现方式时使用。Use before any change touching more than one file or altering a contract.
+description: "把任务转成可执行计划,包含范围、步骤、每步的验证命令和文档影响。当变更涉及多个文件、改动契约、或存在多种合理实现方式时使用。Use before any change touching more than one file or altering a contract."
 metadata:
   x-template-version: "1"
 ---

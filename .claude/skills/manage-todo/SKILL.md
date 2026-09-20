@@ -1,6 +1,6 @@
 ---
 name: manage-todo
-description: 读取、创建和更新分层 todo 文件,遵守 .ai/config.yaml 里的 todo mode。任务开始时、任务结束时,或用户询问当前在做什么、接下来做什么时使用。Use when starting or finishing a task.
+description: "读取、创建和更新分层 todo 文件,遵守 .ai/config.yaml 里的 todo mode。任务开始时、任务结束时,或用户询问当前在做什么、接下来做什么时使用。Use when starting or finishing a task."
 metadata:
   x-template-version: "1"
 ---
