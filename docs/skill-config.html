@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skill Ledger</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..500;1,6..72,400&family=Hanken+Grotesk:wght@400;600;700&family=DM+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;700&display=swap">
+<style>
+/* ============================================================
+   COBALT GRID — two-color trend-report editorial system
+   paper + cobalt ink only. No accent. No depth. Radius 0.
+   Deliberately single-theme: the identity IS cream + cobalt.
+   ============================================================ */
+:root {
+  /* Colors — the whole system */
+  --paper:      #F0EBDE;
+  --paper-2:    #E6E0CE;
+  --ink:        #1F2BE0;
+  --ink-soft:   #5560E5;
+  --grid:       rgba(31, 43, 224, 0.10);
+  --ink-faint:  rgba(31, 43, 224, 0.18);
+
+  /* Faces */
+  --serif: 'Newsreader', 'Noto Serif SC', Georgia, serif;
+  --sans:  'Hanken Grotesk', 'Noto Serif SC', system-ui, sans-serif;
+  --mono:  'DM Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  /* Spacing */
+  --edge:       clamp(20px, 3.6vw, 80px);
+  --pad-top:    clamp(28px, 5vh, 60px);
+  --pad-bottom: clamp(36px, 6vh, 80px);
+  --gap-lg:     clamp(28px, 3vw, 56px);
+  --gap-md:     clamp(20px, 2.2vh, 36px);
+  --gap-sm:     clamp(14px, 1.6vh, 24px);
+  --gap-xs:     clamp(10px, 1.2vh, 18px);
+
+  /* Grid cell */
+  --cell: clamp(28px, 2.2vw, 44px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: clamp(14px, 0.95vw, 15px);
+  line-height: 1.7;              /* CJK body rhythm */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Graph paper — permanent, behind everything, non-disableable */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+}
+
+.sheet {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline: var(--edge);
+  padding-block: var(--pad-top) var(--pad-bottom);
+}
+
+/* ---------- Chrome hairlines ---------- */
+.hairline-top,
+.hairline-bottom {
+  position: fixed;
+  left: var(--edge);
+  right: var(--edge);
+  height: 1.5px;
+  background: var(--ink);
+  z-index: 2;
+  pointer-events: none;
+}
+.hairline-top    { top: calc(2.6vh + env(safe-area-inset-top, 0px)); }
+.hairline-bottom { bottom: calc(2vh + env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 860px) {
+  .hairline-top, .hairline-bottom { display: none; }
+}
+
+.nav-hint,
+.pagenum {
+  position: fixed;
+  bottom: calc(clamp(48px, 4.8vh, 76px) + env(safe-area-inset-bottom, 0px));
+  font-family: var(--mono);
+  font-size: clamp(11px, 0.82vw, 13px);
+  letter-spacing: 0.06em;
+  z-index: 2;
+  pointer-events: none;
+}
+.nav-hint { left: var(--edge); opacity: 0.4; }
+.pagenum { right: var(--edge); }
+@media (max-width: 860px) {
+  .nav-hint, .pagenum { display: none; }
+}
+
+/* ---------- Signature decoration: pixel-glitch column ---------- */
+/* Right-edge scanline column. Shown only from 1440px up, where the
+   centered sheet leaves a clear gutter — it must never sit under the
+   interactive ledger. z-index 0 keeps it below .sheet content. */
+.pixel-glitch {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: clamp(160px, 14vw, 240px);
+  opacity: 0.6;
+  z-index: 0;
+  pointer-events: none;
+  display: none;
+}
+.pixel-glitch svg { display: block; width: 100%; height: 100%; }
+@media (min-width: 1440px) { .pixel-glitch { display: block; } }
+
+/* ---------- Signature decoration: QR-block patch ---------- */
+/* Paper fill plus 1.5px paper outset — the system's only box-shadow,
+   used as an anti-shadow so the mosaic stays readable over the grid. */
+.qr-block {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 1.5px;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  background: var(--paper);
+  padding: 4px;
+  box-shadow: 0 0 0 1.5px var(--paper);
+}
+.qr-block .px { background: var(--paper); }
+.qr-block .px.on { background: var(--ink); }
+
+/* ---------- topbar-rule ---------- */
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+  border-bottom: 1.5px solid var(--ink);
+  padding-bottom: clamp(12px, 1.4vh, 22px);
+  margin-bottom: var(--gap-md);
+}
+.topbar h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(46px, min(4.8vw, 8.2vh), 92px);
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+  margin: 0;
+  text-wrap: balance;
+}
+.topbar-right {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(12px, 1.2vw, 20px);
+}
+.lab-tag {
+  font-family: var(--mono);
+  font-size: clamp(11px, 0.82vw, 13px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+
+.lede {
+  font-family: var(--sans);
+  font-size: clamp(15px, 1vw, 18px);
+  max-width: 62ch;
+  margin: 0 0 var(--gap-md);
+}
+.lede code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--ink-faint);
+}
+
+/* ---------- Column frame ---------- */
+.frame {
+  display: grid;
+  grid-template-columns: 1fr clamp(320px, 30vw, 420px);
+  gap: var(--gap-lg);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .frame { grid-template-columns: 1fr; }
+  .col-output { order: -1; }
+}
+
+/* ---------- Section eyebrow ---------- */
+/* Hanzi label: Hanken 600, no uppercase, no tracking (CJK rules) */
+.eyebrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(12px, 0.9vw, 14px);
+  letter-spacing: 0;
+  border-bottom: 1.5px solid var(--ink);
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+}
+.eyebrow .count {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: clamp(11px, 0.82vw, 13px);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- ledger-row: one skill ---------- */
+.ledger-row {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: clamp(12px, 1.4vw, 28px);
+  align-items: start;
+  border-bottom: 1px solid var(--ink-faint);
+  padding-block: clamp(14px, 1.8vh, 24px);
+  transition: opacity 160ms;
+}
+.ledger-row.is-off { opacity: 0.42; }
+
+.num-tag {
+  font-family: var(--mono);
+  font-size: clamp(12px, 0.85vw, 14px);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  padding-top: 5px;
+}
+
+.row-main { min-width: 0; }
+
+.row-head {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(8px, 1vw, 14px);
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.skill-name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(26px, 2vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+}
+.state-tag {
+  font-family: var(--mono);
+  font-size: clamp(11px, 0.78vw, 12px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.state-tag.locked { font-weight: 500; }
+.state-tag.off { opacity: 0.55; }
+
+.row-desc { margin: 0 0 var(--gap-xs); max-width: 58ch; }
+
+.chip-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  font-family: var(--mono);
+  font-size: clamp(11px, 0.8vw, 12.5px);
+  letter-spacing: 0.04em;
+}
+.chip-line .k {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.96em;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.55;
+  margin-right: 8px;
+}
+.chip-line .v + .v::before {
+  content: ' · ';
+  opacity: 0.45;
+}
+
+/* ---------- Toggle: cobalt fill on, grid cell off. Square. ---------- */
+.switch {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  width: 44px;
+  height: 22px;
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  background: var(--grid);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 160ms;
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  transition: transform 160ms;
+}
+.switch:checked { background: var(--ink); }
+.switch:checked::after { transform: translateX(21px); }
+.switch:disabled { cursor: not-allowed; opacity: 0.45; }
+.switch:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 3px; }
+
+.switch-cell { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; padding-top: 3px; }
+.switch-label {
+  font-family: var(--mono);
+  font-size: clamp(10px, 0.72vw, 11.5px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* ---------- Role override block ---------- */
+.roles {
+  margin-top: var(--gap-xs);
+  border-top: 1px solid var(--ink-faint);
+  padding-top: var(--gap-xs);
+}
+.roles-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(11px, 0.8vw, 12.5px);
+  letter-spacing: 0;
+  opacity: 0.55;
+  margin-bottom: 8px;
+}
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 6px clamp(14px, 1.6vw, 28px);
+}
+.role-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: clamp(11px, 0.8vw, 12.5px);
+  letter-spacing: 0.03em;
+}
+.role-line.na { opacity: 0.35; }
+.role-name { min-width: 62px; }
+.mini-switch {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  width: 26px;
+  height: 13px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--grid);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.mini-switch::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 9px;
+  height: 9px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  transition: transform 140ms;
+}
+.mini-switch:checked { background: var(--ink); }
+.mini-switch:checked::after { transform: translateX(13px); }
+.mini-switch:disabled { cursor: not-allowed; opacity: 0.4; }
+.mini-switch:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 2px; }
+/* Hanzi run: no italic (NSC has no italic axis) — dim to ink-faint instead */
+.inherit {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.94em;
+  letter-spacing: 0;
+  opacity: 0.45;
+}
+
+/* ---------- Output panel ---------- */
+.col-output { position: sticky; top: var(--gap-md); }
+
+.panel {
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1.5px solid var(--ink);
+  padding: 10px clamp(12px, 1.2vw, 18px);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(12px, 0.9vw, 14px);
+  letter-spacing: 0;
+}
+.tally { display: flex; gap: 14px; font-variant-numeric: tabular-nums; }
+.tally .off { opacity: 0.5; }
+
+.yaml {
+  margin: 0;
+  padding: clamp(12px, 1.2vw, 18px);
+  font-family: var(--mono);
+  font-size: clamp(11.5px, 0.85vw, 13px);
+  line-height: 1.75;
+  white-space: pre;
+  overflow-x: auto;
+  max-height: 48vh;
+  overflow-y: auto;
+  tab-size: 2;
+}
+.yaml .c { opacity: 0.5; }
+.yaml .k { font-weight: 500; }
+
+.panel-foot {
+  border-top: 1px solid var(--ink-faint);
+  padding: 10px clamp(12px, 1.2vw, 18px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Hanzi control labels: Hanken 600, no uppercase, no tracking (CJK rules) */
+.btn {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(12px, 0.9vw, 14px);
+  letter-spacing: 0;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 0;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 140ms, color 140ms;
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn:active { background: var(--ink-soft); color: var(--paper); }
+.btn:focus-visible { outline: 1.5px solid var(--ink); outline-offset: 3px; }
+.btn.solid { background: var(--ink); color: var(--paper); }
+.btn.solid:hover { background: var(--paper); color: var(--ink); }
+
+.bar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.next-step {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(11px, 0.8vw, 12.5px);
+  letter-spacing: 0;
+  opacity: 0.62;
+  flex: 1 1 180px;
+  min-width: 0;
+  line-height: 1.55;
+}
+.next-step code {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 0.94em;
+  letter-spacing: 0.04em;
+}
+/* Latin-only chrome stays mono */
+.copied {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: clamp(11px, 0.82vw, 13px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 180ms;
+}
+.copied.show { opacity: 1; }
+
+/* attribution-rule */
+.colophon {
+  margin-top: var(--gap-lg);
+  border-top: 1px solid var(--ink);
+  padding-top: clamp(10px, 1.2vh, 18px);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: clamp(11px, 0.8vw, 12.5px);
+  letter-spacing: 0;
+  opacity: 0.62;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="hairline-top"></div>
+<div class="hairline-bottom"></div>
+<div class="nav-hint">TOGGLE → COPY → AI-SYNC</div>
+<div class="pagenum">01</div>
+
+<div class="pixel-glitch" aria-hidden="true">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+    <defs>
+      <pattern id="vsc" width="2.4" height="100" patternUnits="userSpaceOnUse">
+        <line x1="0.5" y1="0" x2="0.5" y2="100" stroke="#1F2BE0" stroke-width="1.0" />
+      </pattern>
+    </defs>
+    <rect x="0"  y="0"  width="52" height="11" fill="url(#vsc)"/>
+    <rect x="18" y="11" width="48" height="12" fill="url(#vsc)"/>
+    <rect x="4"  y="23" width="56" height="13" fill="url(#vsc)"/>
+    <rect x="22" y="36" width="44" height="11" fill="url(#vsc)"/>
+    <rect x="8"  y="47" width="54" height="12" fill="url(#vsc)"/>
+    <rect x="16" y="59" width="50" height="13" fill="url(#vsc)"/>
+    <rect x="0"  y="72" width="58" height="12" fill="url(#vsc)"/>
+    <rect x="20" y="84" width="46" height="16" fill="url(#vsc)"/>
+  </svg>
+</div>
+
+<div class="sheet">
+  <div class="topbar">
+    <h1>Skill Ledger</h1>
+    <div class="topbar-right">
+      <div class="lab-tag">.ai / config.yaml — skills</div>
+      <div class="qr-block" aria-hidden="true">
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
+        <span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span>
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span>
+        <span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span><span class="px on"></span><span class="px on"></span><span class="px"></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="lede">
+    拨动开关决定哪些技能进入生成的模型入口。右栏实时映射为 <code>config.yaml</code> 片段,
+    复制后替换文件中的 <code>required_skills</code> 与 <code>skills</code> 两段,再执行 <code>python scripts/ai.py sync</code>。
+    标记 LOCKED 的技能由 <code>required_skills</code> 固定,不可关闭。
+  </p>
+
+  <div class="frame">
+    <div class="col-ledger">
+      <div class="eyebrow">
+        <span>Skill / 状态 / 角色覆盖</span>
+        <span class="count" id="eyebrow-count"></span>
+      </div>
+      <div id="ledger"></div>
+
+      <div class="bar-actions" style="margin-top: var(--gap-md)">
+        <button class="btn" id="all-on">全部启用</button>
+        <button class="btn" id="only-locked">仅保留 LOCKED</button>
+        <button class="btn" id="clear-roles">清除角色覆盖</button>
+      </div>
+    </div>
+
+    <div class="col-output">
+      <div class="panel">
+        <div class="panel-head">
+          <span>YAML</span>
+          <span class="tally" id="tally"></span>
+        </div>
+        <pre class="yaml" id="yaml"></pre>
+        <div class="panel-foot">
+          <button class="btn solid" id="copy">复制</button>
+          <span class="copied" id="copied">已复制</span>
+          <span class="next-step">粘贴后执行<br><code>python scripts/ai.py sync</code></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="colophon">
+    <span>AI-PROJECT-TEMPLATE — SKILL SWITCHBOARD</span>
+    <span>COBALT GRID / TWO-COLOR EDITORIAL</span>
+  </div>
+</div>
+
+<script>
+const SKILLS = [
+  { name: "project-bootstrap",
+    desc: "在仓库里落地 .ai 配置体系:填写项目身份、用真实领域规则替换示例、生成各模型入口。接入新项目时执行一次。",
+    agents: ["architect"],
+    scope: [".ai/**"] },
+  { name: "create-plan",
+    desc: "把任务转成可执行计划,含范围、步骤、每步的验证命令与文档影响。多文件变更或改动契约前使用。",
+    agents: ["architect", "backend", "frontend"],
+    scope: ["**/*"] },
+  { name: "manage-todo",
+    desc: "读取、创建、更新分层 todo 文件,遵守 config.yaml 的 todo mode。任务开始与结束时使用。",
+    agents: ["architect", "backend", "frontend"],
+    scope: [".ai/todo/**"] },
+  { name: "update-project-doc",
+    desc: "只更新本次变更真正影响的模块与架构文档,决策变化时新建 ADR。绝不整体重写全局设计文档。",
+    agents: ["architect", "backend", "frontend"],
+    scope: ["docs/**"] },
+  { name: "review-api-change",
+    desc: "判定 API 或契约变更是兼容还是破坏性;破坏性变更必须先有两阶段迁移方案才能落地。",
+    agents: ["architect", "backend", "reviewer"],
+    scope: ["services/**/api/**", "**/*.proto", "docs/apis/**"] },
+  { name: "check-security",
+    desc: "对 diff 做限定范围的安全检查:认证、授权、输入解析、路径处理、密钥、依赖、网络暴露面。",
+    agents: ["reviewer", "backend"],
+    scope: ["**/*"] },
+  { name: "verify-before-complete",
+    desc: "声称完成前执行验证门禁:ai-sync --check、ai-check、lint、变更路径测试、项目构建。",
+    agents: ["architect", "backend", "frontend", "reviewer"],
+    scope: ["**/*"] }
+];
+
+const AGENTS = ["architect", "backend", "frontend", "reviewer"];
+const LOCKED = ["verify-before-complete", "check-security"];
+
+const state = {
+  on: new Set(SKILLS.map(s => s.name)),
+  roles: { architect: null, backend: null, frontend: null, reviewer: null }
+};
+
+const isLocked = n => LOCKED.includes(n);
+const isOn = n => isLocked(n) || state.on.has(n);
+const roleOn = (role, n) =>
+  state.roles[role] === null ? isOn(n) : (isLocked(n) || state.roles[role].has(n));
+
+function el(tag, cls, text) {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function renderLedger() {
+  const host = document.getElementById('ledger');
+  host.textContent = '';
+
+  SKILLS.forEach((skill, i) => {
+    const on = isOn(skill.name);
+    const locked = isLocked(skill.name);
+
+    const row = el('div', 'ledger-row' + (on ? '' : ' is-off'));
+
+    row.appendChild(el('div', 'num-tag', String(i + 1).padStart(2, '0')));
+
+    const main = el('div', 'row-main');
+
+    const head = el('div', 'row-head');
+    head.appendChild(el('div', 'skill-name', skill.name));
+    head.appendChild(el('div',
+      'state-tag ' + (locked ? 'locked' : (on ? '' : 'off')),
+      locked ? 'Locked' : (on ? 'Enabled' : 'Disabled')));
+    main.appendChild(head);
+
+    main.appendChild(el('p', 'row-desc', skill.desc));
+
+    const chips = el('div', 'chip-line');
+    chips.appendChild(el('span', 'k', 'scope'));
+    skill.scope.forEach(s => chips.appendChild(el('span', 'v', s)));
+    main.appendChild(chips);
+
+    if (on) {
+      const roles = el('div', 'roles');
+      roles.appendChild(el('div', 'roles-title', '角色覆盖'));
+      const grid = el('div', 'role-grid');
+
+      AGENTS.forEach(role => {
+        const relevant = skill.agents.includes(role);
+        const line = el('div', 'role-line' + (relevant ? '' : ' na'));
+        line.appendChild(el('span', 'role-name', role));
+
+        const mini = el('input', 'mini-switch');
+        mini.type = 'checkbox';
+        mini.id = `r-${skill.name}-${role}`;
+        mini.checked = roleOn(role, skill.name);
+        mini.disabled = locked || !relevant;
+        mini.setAttribute('aria-label', `${role}: ${skill.name}`);
+        if (!locked && relevant) {
+          mini.addEventListener('change', () => {
+            if (state.roles[role] === null) {
+              state.roles[role] = new Set(SKILLS.filter(s => isOn(s.name)).map(s => s.name));
+            }
+            if (mini.checked) state.roles[role].add(skill.name);
+            else state.roles[role].delete(skill.name);
+            render();
+          });
+        }
+        line.appendChild(mini);
+
+        if (!relevant) line.appendChild(el('span', 'inherit', '不适用'));
+        else if (state.roles[role] === null) line.appendChild(el('span', 'inherit', '继承'));
+
+        grid.appendChild(line);
+      });
+
+      roles.appendChild(grid);
+      main.appendChild(roles);
+    }
+
+    row.appendChild(main);
+
+    const cell = el('div', 'switch-cell');
+    const sw = el('input', 'switch');
+    sw.type = 'checkbox';
+    sw.id = `s-${skill.name}`;
+    sw.checked = on;
+    sw.disabled = locked;
+    sw.setAttribute('aria-label', `${skill.name} 启用`);
+    if (!locked) {
+      sw.addEventListener('change', () => {
+        if (sw.checked) state.on.add(skill.name);
+        else state.on.delete(skill.name);
+        render();
+      });
+    }
+    cell.appendChild(sw);
+    cell.appendChild(el('div', 'switch-label', locked ? 'fixed' : (on ? 'on' : 'off')));
+    row.appendChild(cell);
+
+    host.appendChild(row);
+  });
+}
+
+function buildYaml() {
+  const enabled = SKILLS.filter(s => isOn(s.name)).map(s => s.name);
+  const lines = [];
+
+  lines.push(['c', '# 强制技能,不允许关闭']);
+  lines.push(['k', 'required_skills:']);
+  LOCKED.forEach(n => lines.push(['', '  - ' + n]));
+  lines.push(['', '']);
+  lines.push(['c', '# 项目级启用列表']);
+  lines.push(['k', 'skills:']);
+  lines.push(['k', '  enabled:']);
+  enabled.forEach(n => lines.push(['', '    - ' + n]));
+
+  const overridden = AGENTS.filter(r => state.roles[r] !== null);
+  if (overridden.length) {
+    lines.push(['k', '  role_overrides:']);
+    overridden.forEach(role => {
+      lines.push(['k', `    ${role}:`]);
+      lines.push(['k', '      enabled:']);
+      SKILLS.filter(s => state.roles[role].has(s.name) || isLocked(s.name))
+            .forEach(s => lines.push(['', '        - ' + s.name]));
+    });
+  } else {
+    lines.push(['c', '  # 未设角色覆盖,所有角色继承项目级设置']);
+  }
+  return lines;
+}
+
+function renderYaml() {
+  const pre = document.getElementById('yaml');
+  pre.textContent = '';
+  buildYaml().forEach(([cls, text], i, arr) => {
+    const span = el('span', cls || null, text);
+    pre.appendChild(span);
+    if (i < arr.length - 1) pre.appendChild(document.createTextNode('\n'));
+  });
+}
+
+function yamlText() {
+  return buildYaml().map(([, t]) => t).join('\n') + '\n';
+}
+
+function renderTally() {
+  const on = SKILLS.filter(s => isOn(s.name)).length;
+  const off = SKILLS.length - on;
+  const tally = document.getElementById('tally');
+  tally.textContent = '';
+  tally.appendChild(el('span', null, `${String(on).padStart(2, '0')} on`));
+  tally.appendChild(el('span', 'off', `${String(off).padStart(2, '0')} off`));
+
+  const overridden = AGENTS.filter(r => state.roles[r] !== null).length;
+  document.getElementById('eyebrow-count').textContent =
+    `${SKILLS.length} skills · ${LOCKED.length} locked` +
+    (overridden ? ` · ${overridden} role override${overridden > 1 ? 's' : ''}` : '');
+}
+
+function render() {
+  renderLedger();
+  renderYaml();
+  renderTally();
+}
+
+document.getElementById('all-on').addEventListener('click', () => {
+  state.on = new Set(SKILLS.map(s => s.name));
+  render();
+});
+document.getElementById('only-locked').addEventListener('click', () => {
+  state.on = new Set(LOCKED);
+  AGENTS.forEach(r => { state.roles[r] = null; });
+  render();
+});
+document.getElementById('clear-roles').addEventListener('click', () => {
+  AGENTS.forEach(r => { state.roles[r] = null; });
+  render();
+});
+
+document.getElementById('copy').addEventListener('click', async () => {
+  const note = document.getElementById('copied');
+  try {
+    await navigator.clipboard.writeText(yamlText());
+    note.classList.add('show');
+    setTimeout(() => note.classList.remove('show'), 1800);
+  } catch {
+    const range = document.createRange();
+    range.selectNodeContents(document.getElementById('yaml'));
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+});
+
+render();
+</script>
+</body>
+</html>

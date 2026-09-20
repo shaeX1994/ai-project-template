@@ -1,0 +1,23 @@
+# Adapter: Claude Code.
+# Reads CLAUDE.md at the repo root, and Agent Skills from .claude/skills/<name>/SKILL.md.
+id: claude
+label: "Claude Code"
+reads:
+  - CLAUDE.md
+  - .claude/skills/
+# Highest visibility this adapter may embed. Restricted content is never embedded anywhere.
+max_visibility: internal
+outputs:
+  - type: single_file
+    path: CLAUDE.md
+    title: "Project instructions for Claude Code"
+    sections:
+      - precedence
+      - core
+      - policies
+      - agents
+      - skills
+      - projects
+      - todo
+  - type: skill_dir
+    path: .claude/skills

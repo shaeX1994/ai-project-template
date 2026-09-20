@@ -1,0 +1,94 @@
+# Single source of truth for AI engineering configuration.
+# Human-authored. Never edit generated entry points (AGENTS.md, CLAUDE.md, .cursor/rules, ...).
+schema_version: 1
+
+project:
+  name: example-platform
+  description: "Reference layout for a multi-agent, multi-model repository."
+  repo_url: "https://example.com/example-platform"
+
+# Rule precedence, highest wins. ai-check renders this into every generated entry point
+# so each agent resolves conflicts the same way.
+precedence:
+  - company-standards
+  - project-standards
+  - subproject-standards
+  - module-standards
+  - current-task
+
+# Agents that must exist in .ai/agents/. ai-check fails when one is missing.
+required_agents:
+  - architect
+  - reviewer
+
+# Skills that must exist in .ai/skills/. ai-check fails when one is missing.
+# required_skills: 这些技能必须出现在 skills.enabled 里,否则 ai-check 报错。
+# 用于"不允许被关掉的技能"——合规要求、安全底线等。
+required_skills:
+  - verify-before-complete
+  - check-security
+
+# skills.enabled: 项目级启用列表。不写此字段则全部启用。
+# required_skills 里的技能必须出现在这里,否则 ai-check 报错。
+# role_overrides: 角色级覆盖,可选。不写则角色使用项目级 enabled 列表。
+skills:
+  enabled:
+    - create-plan
+    - manage-todo
+    - update-project-doc
+    - review-api-change
+    - check-security
+    - verify-before-complete
+    - project-bootstrap
+  # role_overrides:
+  #   frontend:
+  #     enabled:
+  #       - create-plan
+  #       - manage-todo
+  #       - update-project-doc
+  #       - verify-before-complete
+
+todo:
+  mode: ask               # on | off | ask
+  prefer_existing: true
+  update_after_task: true
+  files:
+    - .ai/todo/roadmap.md
+    - .ai/todo/project.md
+    - .ai/todo/backend.md
+    - .ai/todo/current-task.md
+
+docs:
+  architecture_dir: docs/architecture
+  modules_dir: docs/modules
+  apis_dir: docs/apis
+  decisions_dir: docs/decisions
+  api_docs_generated: true      # docs/apis is generated from code or schema, agents must not hand-edit
+  check_links: true
+
+# Template metadata. Paths listed here are example content that `ai-init --drop-examples`
+# removes. Delete this block once the project has its own rules.
+template:
+  examples:
+    - .ai/projects/user-service
+    - .ai/projects/payment-service
+    - docs/decisions/0001-example-record-adrs.md
+    - docs/modules/example-module.md
+
+# Adapters to generate. Each id maps to .ai/adapters/<id>.yaml.
+adapters:
+  - claude
+  - codex
+  - cursor
+  - copilot
+  - gemini
+  - windsurf
+  - deepseek
+  - grok
+
+# Phase 3, not implemented by this template. The tool surface is specified in
+# docs/architecture/mcp-surface.md so it can be built without redesigning anything.
+# Markdown rules must stay complete on their own: not every harness speaks MCP.
+mcp:
+  enabled: false
+  server_name: project-context

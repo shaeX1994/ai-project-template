@@ -1,0 +1,26 @@
+# Adapter: DeepSeek harnesses.
+#
+# DeepSeek has no vendor-specific project config convention. Harnesses around it either read
+# AGENTS.md (the cross-tool convention) or take a system prompt / pasted context. So this
+# adapter does not invent a path: it produces one self-contained bundle that can be pasted
+# as a system prompt or loaded by a harness, and defers to AGENTS.md when the harness reads it.
+#
+# If your harness does read a specific file, add a single_file output with that path here.
+# That is the whole point of the adapter layer - no core content changes.
+id: deepseek
+label: "DeepSeek (generic harness)"
+reads:
+  - AGENTS.md
+max_visibility: public
+outputs:
+  - type: prompt_bundle
+    path: .ai/generated/deepseek-context.md
+    title: "DeepSeek context bundle"
+    sections:
+      - precedence
+      - core
+      - policies
+      - agents
+      - skills
+      - projects
+      - todo

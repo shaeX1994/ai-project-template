@@ -1,0 +1,21 @@
+# Adapter: GitHub Copilot.
+# Reads .github/copilot-instructions.md repo-wide, plus .github/instructions/*.instructions.md
+# whose front-matter applyTo glob scopes them to matching files.
+id: copilot
+label: "GitHub Copilot"
+reads:
+  - .github/copilot-instructions.md
+  - .github/instructions/
+max_visibility: public
+outputs:
+  - type: single_file
+    path: .github/copilot-instructions.md
+    title: "Copilot instructions"
+    sections:
+      - precedence
+      - core
+      - policies
+      - skills
+      - projects
+  - type: instructions_dir
+    path: .github/instructions

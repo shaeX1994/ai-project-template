@@ -1,0 +1,16 @@
+# Keep line endings stable across platforms.
+#
+# The toolchain writes LF and hashes normalized text, so a CRLF checkout no longer reports
+# false drift. Forcing LF here keeps diffs clean anyway, and keeps the shell wrappers
+# executable on a machine that checked them out through Windows.
+* text=auto eol=lf
+
+*.py text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.mdc text eol=lf
+*.ps1 text eol=crlf
+
+scripts/ai-sync text eol=lf
+scripts/ai-check text eol=lf

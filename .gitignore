@@ -1,0 +1,13 @@
+# Generated model entry points are committed on purpose: a fresh clone is immediately
+# usable, and ai-sync --check in CI proves they match .ai/. Do not ignore them.
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+.DS_Store
+Thumbs.db
+
+.idea/
+*.swp

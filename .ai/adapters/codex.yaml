@@ -1,0 +1,24 @@
+# Adapter: OpenAI Codex.
+# Reads AGENTS.md, the cross-tool convention also honoured by many other agents.
+# Codex loads the nearest AGENTS.md, so per-service files are emitted alongside the root one.
+id: codex
+label: "OpenAI Codex"
+reads:
+  - AGENTS.md
+max_visibility: internal
+outputs:
+  - type: single_file
+    path: AGENTS.md
+    title: "Agent instructions"
+    sections:
+      - precedence
+      - core
+      - policies
+      - agents
+      - skills
+      - projects
+      - todo
+  # One AGENTS.md per project rule set, placed at the directory its applies_to glob points
+  # at. Codex loads the nearest file, so a change under that directory picks up the domain
+  # rules without the root file having to carry every domain.
+  - type: nested_agents

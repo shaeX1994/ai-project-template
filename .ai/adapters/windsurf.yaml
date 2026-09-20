@@ -1,0 +1,13 @@
+# Adapter: Windsurf.
+# Reads .windsurf/rules/*.md, one rule per file, with glob-style scoping in front matter.
+# Added to demonstrate that a new target costs one adapter file and no core content changes.
+id: windsurf
+label: "Windsurf"
+reads:
+  - .windsurf/rules/
+max_visibility: internal
+outputs:
+  - type: mdc_rules
+    path: .windsurf/rules
+    extension: .md
+    always_apply_core: true

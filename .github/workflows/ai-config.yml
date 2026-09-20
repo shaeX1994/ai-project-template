@@ -1,0 +1,24 @@
+name: ai-config
+
+# Fails the build when generated entry points drift from .ai/, when a rule file is
+# malformed, or when documentation links rot. Same two commands developers run locally.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check generated files match .ai/
+        run: python scripts/ai.py sync --check
+
+      - name: Validate rules, docs, and todo
+        run: python scripts/ai.py check

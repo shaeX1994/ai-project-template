@@ -1,0 +1,107 @@
+# Routing metadata for skills.
+#
+# SKILL.md front matter is kept to the Agent Skills specification (name + description,
+# optional license / compatibility / metadata / allowed-tools), so every skill directory
+# validates with `skills-ref validate` and can be copied verbatim into any target that
+# reads the standard. Everything this template needs beyond the spec lives here: which
+# roles use a skill, which paths it applies to, and its input / output contract.
+#
+# ai-check verifies this file and .ai/skills/*/ stay in one-to-one correspondence.
+schema_version: 1
+
+skills:
+  - name: project-bootstrap
+    visibility: public
+    applies_to:
+      - ".ai/**"
+    agents:
+      - architect
+    inputs:
+      - 刚拷入 .ai/ 的仓库
+    outputs:
+      - 填好的 .ai/config.yaml 与生成的模型入口文件
+
+  - name: create-plan
+    visibility: public
+    applies_to:
+      - "**/*"
+    agents:
+      - architect
+      - backend
+      - frontend
+    inputs:
+      - 任务描述
+      - 已知的影响路径
+    outputs:
+      - 写入 .ai/todo/current-task.md 的计划
+
+  - name: manage-todo
+    visibility: public
+    applies_to:
+      - ".ai/todo/**"
+    agents:
+      - architect
+      - backend
+      - frontend
+    inputs:
+      - 开始或完成的工作
+      - .ai/config.yaml 中的 todo 配置
+    outputs:
+      - 更新后的 .ai/todo/*.md
+
+  - name: update-project-doc
+    visibility: public
+    applies_to:
+      - "docs/**"
+    agents:
+      - architect
+      - backend
+      - frontend
+    inputs:
+      - diff 或变更路径列表
+    outputs:
+      - 更新后的 docs/modules/<module>.md
+      - 决策变化时新增的 ADR
+
+  - name: review-api-change
+    visibility: public
+    applies_to:
+      - "services/**/api/**"
+      - "**/*.proto"
+      - "**/openapi*.yaml"
+      - "docs/apis/**"
+    agents:
+      - architect
+      - backend
+      - reviewer
+    inputs:
+      - 契约 diff
+    outputs:
+      - 兼容或破坏性的结论
+      - 破坏性变更的迁移方案
+
+  - name: check-security
+    visibility: public
+    applies_to:
+      - "**/*"
+    agents:
+      - reviewer
+      - backend
+    inputs:
+      - diff 及其变更路径
+    outputs:
+      - 按严重程度排序的问题列表,或明确的无发现
+
+  - name: verify-before-complete
+    visibility: public
+    applies_to:
+      - "**/*"
+    agents:
+      - architect
+      - backend
+      - frontend
+      - reviewer
+    inputs:
+      - 已完成的变更
+    outputs:
+      - 含实际执行命令的验证报告

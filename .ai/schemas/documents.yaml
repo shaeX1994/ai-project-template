@@ -1,0 +1,84 @@
+# Front-matter contract for every hand-written document under .ai/.
+# ai-check reads this file instead of hardcoding field names, so adding a rule type means
+# editing this file, not the validator.
+schema_version: 1
+
+# Allowed values for the visibility field.
+# public     - body may be embedded into any generated entry point
+# internal   - body embedded only into adapters whose max_visibility is internal
+# restricted - body never embedded anywhere; generated files carry a pointer only
+visibility_levels:
+  - public
+  - internal
+  - restricted
+
+types:
+  core:
+    path_glob: ".ai/core/*.md"
+    required:
+      - name
+      - description
+      - visibility
+      - applies_to
+    optional:
+      - roles
+
+  agent:
+    path_glob: ".ai/agents/*.md"
+    required:
+      - name
+      - description
+      - visibility
+      - scope
+    optional:
+      - loads
+      - policies
+      - skills
+    # Values in these fields must resolve to existing files or known skill names.
+    reference_fields:
+      - loads
+      - policies
+
+  policy:
+    path_glob: ".ai/policies/*.md"
+    required:
+      - name
+      - description
+      - visibility
+      - enforcement
+      - applies_to
+    optional:
+      - roles
+    enum:
+      enforcement:
+        - blocking
+        - advisory
+
+  project:
+    path_glob: ".ai/projects/*/rules.md"
+    required:
+      - name
+      - description
+      - visibility
+      - applies_to
+    optional:
+      - owners
+
+  skill:
+    path_glob: ".ai/skills/*/SKILL.md"
+    # Agent Skills specification: only these fields are allowed at the top level.
+    # Routing metadata lives in .ai/skills/index.yaml instead.
+    required:
+      - name
+      - description
+    optional:
+      - license
+      - compatibility
+      - metadata
+      - allowed-tools
+    strict: true
+    constraints:
+      name_matches_dir: true
+      name_pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+      name_max: 64
+      description_max: 1024

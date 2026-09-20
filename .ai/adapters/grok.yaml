@@ -1,0 +1,22 @@
+# Adapter: Grok / grok-code harnesses.
+#
+# Same situation as DeepSeek: no stable vendor-specific project file. Produces a pasteable
+# bundle and relies on AGENTS.md where the harness supports it. Point the bundle at a real
+# path with a single_file output if your harness reads one.
+id: grok
+label: "Grok (generic harness)"
+reads:
+  - AGENTS.md
+max_visibility: public
+outputs:
+  - type: prompt_bundle
+    path: .ai/generated/grok-context.md
+    title: "Grok context bundle"
+    sections:
+      - precedence
+      - core
+      - policies
+      - agents
+      - skills
+      - projects
+      - todo

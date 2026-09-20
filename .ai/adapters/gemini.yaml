@@ -1,0 +1,20 @@
+# Adapter: Gemini CLI.
+# Reads GEMINI.md at the repo root. Also reads AGENTS.md in recent versions, but GEMINI.md
+# wins when both exist, so this adapter owns GEMINI.md explicitly.
+id: gemini
+label: "Gemini CLI"
+reads:
+  - GEMINI.md
+max_visibility: internal
+outputs:
+  - type: single_file
+    path: GEMINI.md
+    title: "Project instructions for Gemini CLI"
+    sections:
+      - precedence
+      - core
+      - policies
+      - agents
+      - skills
+      - projects
+      - todo

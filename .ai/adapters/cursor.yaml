@@ -1,0 +1,13 @@
+# Adapter: Cursor.
+# Uses .cursor/rules/*.mdc, one rule per source file, with glob scoping in front matter.
+# This is the adapter that gets directory-scoped loading natively: project rules attach
+# only when a matching file is in context, so the payment domain never loads for UI work.
+id: cursor
+label: "Cursor"
+reads:
+  - .cursor/rules/
+max_visibility: internal
+outputs:
+  - type: mdc_rules
+    path: .cursor/rules
+    always_apply_core: true
