@@ -44,7 +44,7 @@
 
   /* Radii — no square corners */
   --radius-card: 24px;
-  --radius-sm:   12px;
+  --radius-sm:   14px;
   --radius-pill: 999px;
 }
 
@@ -186,13 +186,17 @@ body {
   margin-bottom: var(--gap-xs);
   transition: opacity 160ms, background 160ms;
 }
+/* State reads from the pill and the dropped fill, not from fading the text.
+   Opacity is capped at 0.88 because ink-soft body copy hits 4.9:1 against the
+   paper there; 0.78 measured 3.92:1 and 0.48 measured 2.16:1, both below AA. */
 .ledger-row.is-off {
-  opacity: 0.48;
+  opacity: 0.88;
   background: transparent;
 }
 
 /* Locked skills get a lemon card fill to make them stand out */
 .ledger-row.is-locked {
+  background: var(--blush);   /* fallback for pre-2023 engines */
   background: color-mix(in srgb, var(--lemon) 28%, var(--card-fill));
 }
 
@@ -326,7 +330,6 @@ body {
   color: var(--ink-soft);
 }
 
-
 /* ---------- Output panel (card-soft) ---------- */
 .col-output { position: sticky; top: var(--gap-md); }
 
@@ -358,6 +361,9 @@ body {
 }
 .tally .off { color: var(--ink-soft); }
 
+/* Deliberate deviation: Soft Editorial forbids mono, but YAML indentation is
+   semantic — proportional spaces make nesting depth hard to scan, and this text
+   is destined for an editor that will render it mono anyway. Kept on purpose. */
 .yaml {
   margin: 0;
   padding: clamp(12px, 1.2vw, 18px);
@@ -423,12 +429,13 @@ body {
   line-height: 1.55;
 }
 .next-step code {
-  font-family: 'ui-monospace', 'Cascadia Mono', monospace;
-  font-size: 0.92em;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 0.94em;
   color: var(--ink);
   background: var(--blush);
-  padding: 1px 4px;
-  border-radius: 4px;
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
 }
 .copied {
   font-family: var(--serif);
@@ -437,9 +444,10 @@ body {
   font-size: clamp(11px, 0.78vw, 13px);
   color: var(--ink-soft);
   opacity: 0;
+  visibility: hidden;
   transition: opacity 180ms;
 }
-.copied.show { opacity: 1; }
+.copied.show { opacity: 1; visibility: visible; }
 
 /* ---------- Colophon ---------- */
 .colophon {
@@ -466,13 +474,13 @@ body {
 
 <div class="sheet">
   <div class="topbar">
-    <h1>Skill Ledger</h1>
+    <h1>Skill <em>Ledger</em></h1>
     <div class="topbar-right">
       <div class="lab-tag">.ai / config.yaml — skills</div>
       <div class="swatch-row" aria-hidden="true">
-        <span class="swatch-dot" style="background:#E1A4C2"></span>
-        <span class="swatch-dot" style="background:#D6DD63"></span>
-        <span class="swatch-dot" style="background:#B7C7A8"></span>
+        <span class="swatch-dot" style="background:var(--pink)"></span>
+        <span class="swatch-dot" style="background:var(--lemon)"></span>
+        <span class="swatch-dot" style="background:var(--sage)"></span>
       </div>
     </div>
   </div>
@@ -481,12 +489,13 @@ body {
     拨动开关决定哪些技能进入生成的模型入口。右栏实时映射为 <code>config.yaml</code> 片段,
     复制后替换文件中的 <code>required_skills</code> 与 <code>skills</code> 两段,再执行 <code>python scripts/ai.py sync</code>。
     标记 LOCKED 的技能由 <code>required_skills</code> 固定,不可关闭。
+    若你的 <code>config.yaml</code> 里已有 <code>skills.role_overrides</code>,本页不生成该段,替换时请自行保留。
   </p>
 
   <div class="frame">
     <div class="col-ledger">
       <div class="eyebrow">
-        <span>Skill / 状态 / 角色覆盖</span>
+        <span>Skill / 状态</span>
         <span class="count" id="eyebrow-count"></span>
       </div>
       <div id="ledger"></div>
@@ -506,7 +515,7 @@ body {
         <pre class="yaml" id="yaml"></pre>
         <div class="panel-foot">
           <button class="btn solid" id="copy">复制</button>
-          <span class="copied" id="copied">已复制</span>
+          <span class="copied" id="copied" role="status" aria-live="polite"></span>
           <span class="next-step">粘贴后执行<br><code>python scripts/ai.py sync</code></span>
         </div>
       </div>
@@ -514,8 +523,8 @@ body {
   </div>
 
   <div class="colophon">
-    <span>AI-PROJECT-TEMPLATE — SKILL SWITCHBOARD</span>
-    <span>SOFT EDITORIAL / WARM MAGAZINE SPREAD</span>
+    <span>ai-project-template — skill switchboard</span>
+    <span>Soft editorial / warm magazine spread</span>
   </div>
 </div>
 
@@ -524,35 +533,28 @@ body {
 const SKILLS = [
   { name: "check-security",
     desc: "对 diff 做限定范围的安全检查:认证、授权、输入解析、路径处理、密钥、依赖、网络暴露面。",
-    agents: ["reviewer", "backend"],
     scope: ["**/*"] },
   { name: "verify-before-complete",
     desc: "声称完成前执行验证门禁:ai-sync --check、ai-check、lint、变更路径测试、项目构建。",
-    agents: ["architect", "backend", "frontend", "reviewer"],
     scope: ["**/*"] },
   { name: "project-bootstrap",
     desc: "在仓库里落地 .ai 配置体系:填写项目身份、用真实领域规则替换示例、生成各模型入口。接入新项目时执行一次。",
-    agents: ["architect"],
     scope: [".ai/**"] },
   { name: "create-plan",
     desc: "把任务转成可执行计划,含范围、步骤、每步的验证命令与文档影响。多文件变更或改动契约前使用。",
-    agents: ["architect", "backend", "frontend"],
     scope: ["**/*"] },
   { name: "manage-todo",
     desc: "读取、创建、更新分层 todo 文件,遵守 config.yaml 的 todo mode。任务开始与结束时使用。",
-    agents: ["architect", "backend", "frontend"],
     scope: [".ai/todo/**"] },
   { name: "update-project-doc",
     desc: "只更新本次变更真正影响的模块与架构文档,决策变化时新建 ADR。绝不整体重写全局设计文档。",
-    agents: ["architect", "backend", "frontend"],
     scope: ["docs/**"] },
   { name: "review-api-change",
     desc: "判定 API 或契约变更是兼容还是破坏性;破坏性变更必须先有两阶段迁移方案才能落地。",
-    agents: ["architect", "backend", "reviewer"],
     scope: ["services/**/api/**", "**/*.proto", "docs/apis/**"] },
 ];
 
-const LOCKED = ["verify-before-complete", "check-security"];
+const LOCKED = ["check-security", "verify-before-complete"];
 
 const state = {
   on: new Set(SKILLS.map(s => s.name))
@@ -617,6 +619,8 @@ function renderLedger() {
         if (sw.checked) state.on.add(skill.name);
         else state.on.delete(skill.name);
         render();
+        // renderLedger() rebuilds every row, which drops focus to <body>.
+        document.getElementById(`s-${skill.name}`)?.focus();
       });
     }
     cell.appendChild(sw);
@@ -687,6 +691,7 @@ document.getElementById('copy').addEventListener('click', async () => {
   const note = document.getElementById('copied');
   try {
     await navigator.clipboard.writeText(yamlText());
+    note.textContent = '已复制';
     note.classList.add('show');
     setTimeout(() => note.classList.remove('show'), 1800);
   } catch {
@@ -695,6 +700,9 @@ document.getElementById('copy').addEventListener('click', async () => {
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
+    note.textContent = '已选中,请按 Ctrl+C 复制';
+    note.classList.add('show');
+    setTimeout(() => note.classList.remove('show'), 3000);
   }
 });
 
