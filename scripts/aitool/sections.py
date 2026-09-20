@@ -56,25 +56,6 @@ def agents(ws, adapter):
     return "\n".join(lines) + "\n", []
 
 
-def skills(ws, adapter, role=None):
-    enabled = ws.enabled_skills(role)
-    lines = ["## 技能", "",
-             "技能是可复用的工作流。触发条件匹配时读取对应 `SKILL.md` 并按步骤执行:", "",
-             "| 技能 | 用途 | 适用范围 | 文件 |", "| --- | --- | --- | --- |"]
-    shown = 0
-    for doc in ws.skills:
-        if doc.name not in enabled:
-            continue
-        meta = ws.skill_meta(doc.name)
-        applies = meta.get("applies_to") or []
-        scope = ", ".join(f"`{g}`" for g in applies) or "—"
-        lines.append(f"| {doc.name} | {doc.description} | {scope} | `{doc.rel}` |")
-        shown += 1
-    if shown == 0:
-        lines.append("| — | 本项目未启用任何技能 | — | — |")
-    return "\n".join(lines) + "\n", []
-
-
 def projects(ws, adapter):
     if not ws.projects:
         return "", []

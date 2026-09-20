@@ -1,4 +1,9 @@
-"""Renderers. One per output type; each returns {relative path: content}."""
+"""Renderers. One per output type; each returns ({path: content}, {path: [sources]}).
+
+The second dict maps every output path to the list of source files it actually
+embeds, so the manifest records accurate per-file provenance rather than the
+aggregate set of everything the renderer touched.
+"""
 
 from __future__ import annotations
 
@@ -39,7 +44,7 @@ def single_file(ws, adapter, spec):
         raise ConfigError(f"adapter '{adapter['id']}': single_file output needs a path")
     title = spec.get("title") or f"{ws.project_name} 项目规则"
     text, embedded = _compose(ws, adapter, spec, title)
-    return {path: text}, embedded
+    return {path: text}, {path: embedded}
 
 
 def prompt_bundle(ws, adapter, spec):
@@ -51,14 +56,14 @@ def prompt_bundle(ws, adapter, spec):
         "> 整段作为 system prompt 粘贴,或由 harness 加载。\n"
         f"> 由 `scripts/ai-sync` 生成,请勿手改。\n\n")
     head, _, rest = text.partition("\n\n")
-    return {path: f"{head}\n\n{intro}{rest}"}, embedded
+    return {path: f"{head}\n\n{intro}{rest}"}, {path: embedded}
 
 
 def skill_dir(ws, adapter, spec):
     """Copy skills as spec-compliant SKILL.md files into the target's skill directory."""
     base = spec.get("path")
     enabled = ws.enabled_skills()
-    files = {}
+    files, embeds = {}, {}
     for doc in ws.skills:
         if doc.name not in enabled:
             continue
@@ -74,8 +79,10 @@ def skill_dir(ws, adapter, spec):
             meta.extend(f"  {k}: \"{v}\"" for k, v in extra.items())
         front = "---\n" + "\n".join(meta) + "\n---\n"
         body = f"\n<!-- {BANNER} -->\n\n{doc.body.rstrip()}\n"
-        files[f"{base}/{doc.name}/SKILL.md"] = front + body
-    return files, [d.rel for d in ws.skills if may_embed(d, adapter)]
+        path = f"{base}/{doc.name}/SKILL.md"
+        files[path] = front + body
+        embeds[path] = [doc.rel]
+    return files, embeds
 
 
 def mdc_rules(ws, adapter, spec):
@@ -83,7 +90,7 @@ def mdc_rules(ws, adapter, spec):
     base = spec.get("path")
     ext = spec.get("extension") or ".mdc"
     always_core = bool(spec.get("always_apply_core", True))
-    files, embedded = {}, []
+    files, embeds = {}, {}
     groups = [("core", ws.core, always_core), ("policy", ws.policies, always_core),
               ("domain", ws.projects, False)]
     for prefix, docs, always in groups:
@@ -94,24 +101,26 @@ def mdc_rules(ws, adapter, spec):
             front = ["---", f"description: {doc.description}",
                      f"globs: {globs}", f"alwaysApply: {str(always).lower()}", "---"]
             content = "\n".join(front) + f"\n\n<!-- {BANNER} -->\n\n{doc.body.rstrip()}\n"
-            files[f"{base}/{prefix}-{doc.name}{ext}"] = content
-            embedded.append(doc.rel)
-    return files, embedded
+            path = f"{base}/{prefix}-{doc.name}{ext}"
+            files[path] = content
+            embeds[path] = [doc.rel]
+    return files, embeds
 
 
 def instructions_dir(ws, adapter, spec):
     """Copilot-style per-path instruction files using applyTo front matter."""
     base = spec.get("path")
-    files, embedded = {}, []
+    files, embeds = {}, {}
     for doc in ws.projects:
         if not may_embed(doc, adapter):
             continue
         apply_to = ",".join(doc.globs) or "**"
         front = ["---", f"applyTo: \"{apply_to}\"", "---"]
-        files[f"{base}/{doc.name}.instructions.md"] = (
+        path = f"{base}/{doc.name}.instructions.md"
+        files[path] = (
             "\n".join(front) + f"\n\n<!-- {BANNER} -->\n\n{doc.body.rstrip()}\n")
-        embedded.append(doc.rel)
-    return files, embedded
+        embeds[path] = [doc.rel]
+    return files, embeds
 
 
 def nested_agents(ws, adapter, spec):
@@ -120,7 +129,7 @@ def nested_agents(ws, adapter, spec):
     Only written where the directory already exists, so the template does not scatter
     stub files into service trees that have not been created yet.
     """
-    files, embedded = {}, []
+    files, embeds = {}, {}
     for doc in ws.projects:
         if not may_embed(doc, adapter):
             continue
@@ -129,12 +138,13 @@ def nested_agents(ws, adapter, spec):
             if not head or not (ws.root / head).is_dir():
                 continue
             body = shift_headings(doc.body.rstrip(), 0)
-            files[f"{head}/AGENTS.md"] = (
+            path = f"{head}/AGENTS.md"
+            files[path] = (
                 f"# {doc.name}\n\n<!-- {BANNER} -->\n\n"
                 f"本目录的领域规则。仓库级规则见根目录 `AGENTS.md`。\n\n{body}\n")
-            embedded.append(doc.rel)
+            embeds[path] = [doc.rel]
             break
-    return files, embedded
+    return files, embeds
 
 
 RENDERERS = {
@@ -166,7 +176,10 @@ def plan(ws):
                         f"'{owners[path]}' and '{adapter['id']}'")
                 files[path] = content
                 owners[path] = adapter["id"]
-                embeds[path] = sorted(set(embedded))
+                # Per-file provenance: each renderer reports exactly which sources
+                # that output embeds, so a restricted source is attributed only to
+                # the files that genuinely contain it.
+                embeds[path] = sorted(set(embedded.get(path) or []))
     return files, owners, embeds
 
 

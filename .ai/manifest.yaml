@@ -29,174 +29,76 @@ outputs:
     hash: 73e568f402874f20
     embeds:
       - .ai/skills/check-security/SKILL.md
-      - .ai/skills/create-plan/SKILL.md
-      - .ai/skills/manage-todo/SKILL.md
-      - .ai/skills/project-bootstrap/SKILL.md
-      - .ai/skills/review-api-change/SKILL.md
-      - .ai/skills/update-project-doc/SKILL.md
-      - .ai/skills/verify-before-complete/SKILL.md
   - path: .claude/skills/create-plan/SKILL.md
     adapter: claude
     hash: 6b802a2caa21301a
     embeds:
-      - .ai/skills/check-security/SKILL.md
       - .ai/skills/create-plan/SKILL.md
-      - .ai/skills/manage-todo/SKILL.md
-      - .ai/skills/project-bootstrap/SKILL.md
-      - .ai/skills/review-api-change/SKILL.md
-      - .ai/skills/update-project-doc/SKILL.md
-      - .ai/skills/verify-before-complete/SKILL.md
   - path: .claude/skills/manage-todo/SKILL.md
     adapter: claude
     hash: 375be28d9d0bb33b
     embeds:
-      - .ai/skills/check-security/SKILL.md
-      - .ai/skills/create-plan/SKILL.md
       - .ai/skills/manage-todo/SKILL.md
-      - .ai/skills/project-bootstrap/SKILL.md
-      - .ai/skills/review-api-change/SKILL.md
-      - .ai/skills/update-project-doc/SKILL.md
-      - .ai/skills/verify-before-complete/SKILL.md
   - path: .claude/skills/project-bootstrap/SKILL.md
     adapter: claude
     hash: 44dcde897e0fd68f
     embeds:
-      - .ai/skills/check-security/SKILL.md
-      - .ai/skills/create-plan/SKILL.md
-      - .ai/skills/manage-todo/SKILL.md
       - .ai/skills/project-bootstrap/SKILL.md
-      - .ai/skills/review-api-change/SKILL.md
-      - .ai/skills/update-project-doc/SKILL.md
-      - .ai/skills/verify-before-complete/SKILL.md
   - path: .claude/skills/review-api-change/SKILL.md
     adapter: claude
     hash: 61f1af06820845c1
     embeds:
-      - .ai/skills/check-security/SKILL.md
-      - .ai/skills/create-plan/SKILL.md
-      - .ai/skills/manage-todo/SKILL.md
-      - .ai/skills/project-bootstrap/SKILL.md
       - .ai/skills/review-api-change/SKILL.md
-      - .ai/skills/update-project-doc/SKILL.md
-      - .ai/skills/verify-before-complete/SKILL.md
   - path: .claude/skills/update-project-doc/SKILL.md
     adapter: claude
     hash: c2d5f2b6f9694f2e
     embeds:
-      - .ai/skills/check-security/SKILL.md
-      - .ai/skills/create-plan/SKILL.md
-      - .ai/skills/manage-todo/SKILL.md
-      - .ai/skills/project-bootstrap/SKILL.md
-      - .ai/skills/review-api-change/SKILL.md
       - .ai/skills/update-project-doc/SKILL.md
-      - .ai/skills/verify-before-complete/SKILL.md
   - path: .claude/skills/verify-before-complete/SKILL.md
     adapter: claude
     hash: d0b05b2c644a407d
     embeds:
-      - .ai/skills/check-security/SKILL.md
-      - .ai/skills/create-plan/SKILL.md
-      - .ai/skills/manage-todo/SKILL.md
-      - .ai/skills/project-bootstrap/SKILL.md
-      - .ai/skills/review-api-change/SKILL.md
-      - .ai/skills/update-project-doc/SKILL.md
       - .ai/skills/verify-before-complete/SKILL.md
   - path: .cursor/rules/core-architecture.mdc
     adapter: cursor
     hash: 273ee33797b6058a
     embeds:
       - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .cursor/rules/core-coding-rules.mdc
     adapter: cursor
     hash: 4d22bf8d501d0b9e
     embeds:
-      - .ai/core/architecture.md
       - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .cursor/rules/core-documentation.mdc
     adapter: cursor
     hash: c7be8b154deb8a4d
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
       - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .cursor/rules/core-workflow.mdc
     adapter: cursor
     hash: 513c5d899de7df81
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
       - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .cursor/rules/domain-payment-service.mdc
     adapter: cursor
     hash: 21c171bb25b341e8
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
       - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .cursor/rules/domain-user-service.mdc
     adapter: cursor
     hash: dc21407c475579c7
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
       - .ai/projects/user-service/rules.md
   - path: .cursor/rules/policy-release.mdc
     adapter: cursor
     hash: b4eed300798d3707
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
       - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .cursor/rules/policy-security.mdc
     adapter: cursor
     hash: 3932c838d583e769
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
       - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .github/copilot-instructions.md
     adapter: copilot
     hash: 272094d097400ec8
@@ -211,109 +113,51 @@ outputs:
     hash: ea8f2e5267a0b224
     embeds:
       - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .github/instructions/user-service.instructions.md
     adapter: copilot
     hash: 3aa15f35f895ffa4
     embeds:
-      - .ai/projects/payment-service/rules.md
       - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/core-architecture.md
     adapter: windsurf
     hash: 273ee33797b6058a
     embeds:
       - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/core-coding-rules.md
     adapter: windsurf
     hash: 4d22bf8d501d0b9e
     embeds:
-      - .ai/core/architecture.md
       - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/core-documentation.md
     adapter: windsurf
     hash: c7be8b154deb8a4d
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
       - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/core-workflow.md
     adapter: windsurf
     hash: 513c5d899de7df81
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
       - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/domain-payment-service.md
     adapter: windsurf
     hash: 21c171bb25b341e8
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
       - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/domain-user-service.md
     adapter: windsurf
     hash: dc21407c475579c7
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
       - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/policy-release.md
     adapter: windsurf
     hash: b4eed300798d3707
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
       - .ai/policies/release.md
-      - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: .windsurf/rules/policy-security.md
     adapter: windsurf
     hash: 3932c838d583e769
     embeds:
-      - .ai/core/architecture.md
-      - .ai/core/coding-rules.md
-      - .ai/core/documentation.md
-      - .ai/core/workflow.md
-      - .ai/policies/release.md
       - .ai/policies/security.md
-      - .ai/projects/payment-service/rules.md
-      - .ai/projects/user-service/rules.md
   - path: AGENTS.md
     adapter: codex
     hash: 87571d8719618fd6
