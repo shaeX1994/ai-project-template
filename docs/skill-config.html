@@ -486,10 +486,10 @@ body {
   </div>
 
   <p class="lede">
-    拨动开关决定哪些技能进入生成的模型入口。右栏实时映射为 <code>config.yaml</code> 片段,
-    复制后替换文件中的 <code>required_skills</code> 与 <code>skills</code> 两段,再执行 <code>python scripts/ai.py sync</code>。
-    标记 LOCKED 的技能由 <code>required_skills</code> 固定,不可关闭。
-    若你的 <code>config.yaml</code> 里已有 <code>skills.role_overrides</code>,本页不生成该段,替换时请自行保留。
+    拨动开关决定哪些技能进入生成的模型入口。右栏实时映射为 <code>config.yaml</code> 片段，
+    复制后替换文件中的 <code>required_skills</code> 与 <code>skills</code> 两段，再执行 <code>python scripts/ai.py sync</code>。
+    标记 LOCKED 的技能由 <code>required_skills</code> 固定，不可关闭。
+    若你的 <code>config.yaml</code> 里已有 <code>skills.role_overrides</code>，本页不生成该段，替换时请自行保留。
   </p>
 
   <div class="frame">
@@ -532,25 +532,25 @@ body {
 // LOCKED skills first, then optional skills
 const SKILLS = [
   { name: "check-security",
-    desc: "对 diff 做限定范围的安全检查:认证、授权、输入解析、路径处理、密钥、依赖、网络暴露面。",
+    desc: "对 diff 做限定范围的安全检查：认证、授权、输入解析、路径处理、密钥、依赖、网络暴露面。",
     scope: ["**/*"] },
   { name: "verify-before-complete",
-    desc: "声称完成前执行验证门禁:ai-sync --check、ai-check、lint、变更路径测试、项目构建。",
+    desc: "声称完成前执行验证门禁：ai-sync --check、ai-check、lint、变更路径测试、项目构建。",
     scope: ["**/*"] },
   { name: "project-bootstrap",
-    desc: "在仓库里落地 .ai 配置体系:填写项目身份、用真实领域规则替换示例、生成各模型入口。接入新项目时执行一次。",
+    desc: "在仓库里落地 .ai 配置体系：填写项目身份、用真实领域规则替换示例、生成各模型入口。接入新项目时执行一次。",
     scope: [".ai/**"] },
   { name: "create-plan",
-    desc: "把任务转成可执行计划,含范围、步骤、每步的验证命令与文档影响。多文件变更或改动契约前使用。",
+    desc: "把任务转成可执行计划，含范围、步骤、每步的验证命令与文档影响。多文件变更或改动契约前使用。",
     scope: ["**/*"] },
   { name: "manage-todo",
-    desc: "读取、创建、更新分层 todo 文件,遵守 config.yaml 的 todo mode。任务开始与结束时使用。",
+    desc: "读取、创建、更新分层 todo 文件，遵守 config.yaml 的 todo mode。任务开始与结束时使用。",
     scope: [".ai/todo/**"] },
   { name: "update-project-doc",
-    desc: "只更新本次变更真正影响的模块与架构文档,决策变化时新建 ADR。绝不整体重写全局设计文档。",
+    desc: "只更新本次变更真正影响的模块与架构文档，决策变化时新建 ADR。绝不整体重写全局设计文档。",
     scope: ["docs/**"] },
   { name: "review-api-change",
-    desc: "判定 API 或契约变更是兼容还是破坏性;破坏性变更必须先有两阶段迁移方案才能落地。",
+    desc: "判定 API 或契约变更是兼容还是破坏性；破坏性变更必须先有两阶段迁移方案才能落地。",
     scope: ["services/**/api/**", "**/*.proto", "docs/apis/**"] },
 ];
 
@@ -635,7 +635,7 @@ function buildYaml() {
   const enabled = SKILLS.filter(s => isOn(s.name)).map(s => s.name);
   const lines = [];
 
-  lines.push(['c', '# 强制技能,不允许关闭']);
+  lines.push(['c', '# 强制技能，不允许关闭']);
   lines.push(['k', 'required_skills:']);
   LOCKED.forEach(n => lines.push(['', '  - ' + n]));
   lines.push(['', '']);
@@ -700,7 +700,7 @@ document.getElementById('copy').addEventListener('click', async () => {
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-    note.textContent = '已选中,请按 Ctrl+C 复制';
+    note.textContent = '已选中，请按 Ctrl+C 复制';
     note.classList.add('show');
     setTimeout(() => note.classList.remove('show'), 3000);
   }
